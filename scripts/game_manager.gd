@@ -8,7 +8,7 @@ signal derrota
 @export_node_path("Area2D") var meta_path: NodePath
 @export var objetivo_minimo: int = 20
 @export var gotas_totales: int = 100
-@export var espera_derrota_segundos: float = 4.0
+@export var espera_derrota_segundos: float = 10.0
 
 var gotas_generadas := 0
 var gotas_recibidas := 0
@@ -39,6 +39,7 @@ func _on_gota_recibida(total_recibidas: int) -> void:
 
 	gotas_recibidas = total_recibidas
 	contador_actualizado.emit(gotas_recibidas, objetivo_minimo)
+	print("Gotas recibidas: %s / %s" % [gotas_recibidas, objetivo_minimo])
 
 	if gotas_recibidas >= objetivo_minimo:
 		_finalizar_con_victoria()

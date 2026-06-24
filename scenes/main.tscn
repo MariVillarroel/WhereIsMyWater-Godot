@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scripts/meta_agua.gd" id="6_meta_script"]
 [ext_resource type="Texture2D" path="res://assets/goal_zone.svg" id="7_goal_texture"]
 [ext_resource type="Script" path="res://scripts/game_manager.gd" id="8_game_manager_script"]
+[ext_resource type="Script" path="res://scripts/ui_manager.gd" id="9_ui_manager_script"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_meta"]
 size = Vector2(96, 96)
@@ -38,6 +39,10 @@ texture = ExtResource("7_goal_texture")
 shape = SubResource("RectangleShape2D_meta")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1082417892]
+script = ExtResource("9_ui_manager_script")
+game_manager_path = NodePath("../GameManager")
+contador_label_path = NodePath("ContadorGotas")
+mensaje_label_path = NodePath("MensajeEstado")
 
 [node name="ContadorGotas" type="Label" parent="UI" unique_id=1492221830]
 offset_left = 24.0
@@ -58,3 +63,4 @@ horizontal_alignment = 1
 script = ExtResource("8_game_manager_script")
 spawner_path = NodePath("../SpawnerAgua")
 meta_path = NodePath("../MetaAgua")
+espera_derrota_segundos = 10.0
