@@ -2,8 +2,8 @@ extends RigidBody2D
 
 const GRUPO_GOTAS := "gotas_agua"
 
-@export var fuerza_agitacion_lateral: float = 18.0
-@export var velocidad_horizontal_maxima: float = 120.0
+@export var impulso_agitacion_lateral: float = 0.18
+@export var velocidad_horizontal_maxima: float = 150.0
 
 var _direccion_agitacion := 1.0
 
@@ -21,7 +21,7 @@ func _physics_process(_delta: float) -> void:
 		return
 
 	if abs(linear_velocity.x) < velocidad_horizontal_maxima:
-		apply_central_force(Vector2(fuerza_agitacion_lateral * _direccion_agitacion, 0.0))
+		apply_central_impulse(Vector2(impulso_agitacion_lateral * _direccion_agitacion, 0.0))
 
 	if randf() < 0.04:
 		_direccion_agitacion *= -1.0

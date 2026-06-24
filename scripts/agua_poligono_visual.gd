@@ -11,6 +11,9 @@ extends Node2D
 @export var solape_celdas: float = 1.5
 @export_range(0.0, 1.0, 0.01) var suavizado_temporal: float = 0.35
 @export var max_gotas_visuales: int = 140
+@export var debug_visual_simple: bool = false
+@export_range(0.0, 1.0, 0.01) var alpha_gotas_visual: float = 0.06
+@export_range(0.0, 1.0, 0.01) var alpha_gotas_debug: float = 1.0
 
 var _rects_agua: Array[Rect2] = []
 var _rects_borde: Array[Rect2] = []
@@ -19,7 +22,18 @@ var _rects_borde_previos: Array[Rect2] = []
 @onready var _terreno: TileMapLayer = get_node_or_null(terreno_path)
 
 
+func _ready() -> void:
+	_actualizar_visibilidad_gotas()
+
+
 func _process(_delta: float) -> void:
+	_actualizar_visibilidad_gotas()
+
+	if debug_visual_simple:
+		_limpiar_visual()
+		queue_redraw()
+		return
+
 	_actualizar_poligonos()
 	queue_redraw()
 
@@ -58,6 +72,28 @@ func _actualizar_poligonos() -> void:
 	_rects_agua = _interpolar_rects(_rects_agua_previos, rects_agua_nuevos)
 	_rects_borde_previos = _rects_borde.duplicate()
 	_rects_agua_previos = _rects_agua.duplicate()
+
+
+func _limpiar_visual() -> void:
+	_rects_agua.clear()
+	_rects_borde.clear()
+	_rects_agua_previos.clear()
+	_rects_borde_previos.clear()
+
+
+func _actualizar_visibilidad_gotas() -> void:
+	var alpha: float = alpha_gotas_debug if debug_visual_simple else alpha_gotas_visual
+	var nodos: Array[Node] = get_tree().get_nodes_in_group(gotas_group)
+
+	for nodo in nodos:
+		if not (nodo is Node2D) or nodo.is_queued_for_deletion():
+			continue
+
+		var sprite: Sprite2D = (nodo as Node2D).get_node_or_null("Sprite2D")
+		if sprite == null:
+			continue
+
+		sprite.modulate.a = alpha
 
 
 func _obtener_posiciones_gotas() -> Array[Vector2]:
