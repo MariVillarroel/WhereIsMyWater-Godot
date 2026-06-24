@@ -10,6 +10,7 @@
 [ext_resource type="Script" uid="uid://ddaqrm8cjj0sg" path="res://scripts/ui_manager.gd" id="9_ui_manager_script"]
 [ext_resource type="Script" uid="uid://ipdpspute3ak" path="res://scripts/zona_perdida.gd" id="10_zona_perdida_script"]
 [ext_resource type="Script" path="res://scripts/agua_poligono_visual.gd" id="11_agua_poligono_script"]
+[ext_resource type="Material" path="res://materials/agua_visual_poligono.tres" id="12_agua_visual_material"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_meta"]
 size = Vector2(96, 96)
@@ -29,6 +30,7 @@ script = ExtResource("2_terrain_script")
 [node name="AguaCanvasGroup" type="CanvasGroup" parent="." unique_id=581249465]
 
 [node name="AguaPoligonoVisual" type="Node2D" parent="."]
+material = ExtResource("12_agua_visual_material")
 script = ExtResource("11_agua_poligono_script")
 terreno_path = NodePath("../Terreno")
 

@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://shaders/agua_visual_poligono.gdshader" id="1_polygon_water_shader"]
+
+[resource]
+shader = ExtResource("1_polygon_water_shader")
+shader_parameter/tint_color = Color(0, 0.46, 1, 1)
+shader_parameter/wave_strength = 0.035
+shader_parameter/wave_scale = 22.0
+shader_parameter/wave_speed = 2.2

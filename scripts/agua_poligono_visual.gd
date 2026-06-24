@@ -2,12 +2,13 @@ extends Node2D
 
 @export var gotas_group: StringName = &"gotas_agua"
 @export_node_path("TileMapLayer") var terreno_path: NodePath
-@export var color_agua: Color = Color(0.08, 0.65, 0.95, 0.58)
-@export var color_borde: Color = Color(0.72, 0.95, 1.0, 0.22)
+@export var color_agua: Color = Color(0.0, 0.46, 1.0, 0.72)
+@export var color_borde: Color = Color(0.45, 0.86, 1.0, 0.32)
 @export var radio_visual: float = 16.0
 @export var radio_borde: float = 21.0
-@export var tamano_celda_visual: float = 12.0
+@export var tamano_celda_visual: float = 6.0
 @export var margen_tierra: float = 2.0
+@export var solape_celdas: float = 1.5
 @export_range(0.0, 1.0, 0.01) var suavizado_temporal: float = 0.35
 @export var max_gotas_visuales: int = 140
 
@@ -92,11 +93,12 @@ func _agregar_celdas_cercanas(centro: Vector2, radio: float, celdas: Dictionary)
 
 func _crear_rects_desde_celdas(celdas: Dictionary) -> Array[Rect2]:
 	var rects: Array[Rect2] = []
-	var tamano: Vector2 = Vector2(tamano_celda_visual, tamano_celda_visual)
+	var tamano: Vector2 = Vector2(tamano_celda_visual + solape_celdas, tamano_celda_visual + solape_celdas)
+	var offset: Vector2 = Vector2(solape_celdas * 0.5, solape_celdas * 0.5)
 
 	for celda in celdas.keys():
 		var celda_visual: Vector2i = celda
-		var posicion: Vector2 = Vector2(celda_visual) * tamano_celda_visual
+		var posicion: Vector2 = Vector2(celda_visual) * tamano_celda_visual - offset
 		rects.append(Rect2(posicion, tamano))
 
 	return rects
