@@ -8,11 +8,11 @@ signal derrota
 @export_node_path("Area2D") var meta_path: NodePath
 @export var objetivo_minimo: int = 20
 @export var gotas_totales: int = 100
-@export var espera_derrota_segundos: float = 10.0
 
 var gotas_generadas := 0
 var gotas_recibidas := 0
 var partida_terminada := false
+var generacion_terminada := false
 
 @onready var _spawner: Node = get_node_or_null(spawner_path)
 @onready var _meta: Area2D = get_node_or_null(meta_path)
@@ -27,6 +27,19 @@ func _ready() -> void:
 		_meta.gota_recibida.connect(_on_gota_recibida)
 
 	contador_actualizado.emit(gotas_recibidas, objetivo_minimo)
+
+
+func _process(_delta: float) -> void:
+	if partida_terminada or not generacion_terminada:
+		return
+
+	var gotas_activas := get_tree().get_nodes_in_group("gotas_agua").filter(
+		func(gota: Node) -> bool:
+			return not gota.is_queued_for_deletion()
+	).size()
+
+	if gotas_recibidas + gotas_activas < objetivo_minimo:
+		_finalizar_con_derrota()
 
 
 func _on_gota_generada(cantidad_generada: int) -> void:
@@ -49,13 +62,7 @@ func _on_generacion_terminada() -> void:
 	if partida_terminada:
 		return
 
-	await get_tree().create_timer(espera_derrota_segundos).timeout
-
-	if partida_terminada:
-		return
-
-	if gotas_recibidas < objetivo_minimo:
-		_finalizar_con_derrota()
+	generacion_terminada = true
 
 
 func _finalizar_con_victoria() -> void:

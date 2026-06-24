@@ -8,9 +8,13 @@
 [ext_resource type="Texture2D" path="res://assets/goal_zone.svg" id="7_goal_texture"]
 [ext_resource type="Script" path="res://scripts/game_manager.gd" id="8_game_manager_script"]
 [ext_resource type="Script" path="res://scripts/ui_manager.gd" id="9_ui_manager_script"]
+[ext_resource type="Script" path="res://scripts/zona_perdida.gd" id="10_zona_perdida_script"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_meta"]
 size = Vector2(96, 96)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_zona_perdida"]
+size = Vector2(1400, 120)
 
 [node name="Mundo" type="Node2D" unique_id=2017408439]
 
@@ -38,6 +42,14 @@ texture = ExtResource("7_goal_texture")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MetaAgua" unique_id=1894593395]
 shape = SubResource("RectangleShape2D_meta")
 
+[node name="ZonaPerdida" type="Area2D" parent="."]
+position = Vector2(640, 760)
+collision_mask = 2
+script = ExtResource("10_zona_perdida_script")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ZonaPerdida"]
+shape = SubResource("RectangleShape2D_zona_perdida")
+
 [node name="UI" type="CanvasLayer" parent="." unique_id=1082417892]
 script = ExtResource("9_ui_manager_script")
 game_manager_path = NodePath("../GameManager")
@@ -63,4 +75,3 @@ horizontal_alignment = 1
 script = ExtResource("8_game_manager_script")
 spawner_path = NodePath("../SpawnerAgua")
 meta_path = NodePath("../MetaAgua")
-espera_derrota_segundos = 10.0
