@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://shaders/agua_metaballs.gdshader" id="1_water_shader"]
+
+[resource]
+shader = ExtResource("1_water_shader")
+shader_parameter/water_color = Color(0.12, 0.68, 0.95, 0.88)
+shader_parameter/threshold = 0.08
+shader_parameter/smoothness = 0.08
+shader_parameter/edge_softness = 0.04
+shader_parameter/alpha_multiplier = 1.2
