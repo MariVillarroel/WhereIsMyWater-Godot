@@ -84,8 +84,7 @@ func registrar_gota_recibida() -> int:
 	gotas_recibidas += 1
 	contador_actualizado.emit(gotas_recibidas, gotas_objetivo)
 
-	if gotas_recibidas >= gotas_objetivo:
-		_finalizar_con_victoria()
+	evaluar_estado()
 
 	return gotas_recibidas
 
@@ -97,9 +96,26 @@ func _on_gota_recibida(total_recibidas: int) -> void:
 	gotas_recibidas = total_recibidas
 	contador_actualizado.emit(gotas_recibidas, gotas_objetivo)
 
-	if gotas_recibidas >= gotas_objetivo:
-		_finalizar_con_victoria()
+	evaluar_estado()
 
+
+func evaluar_estado() -> void:
+	if not puede_jugar():
+		return
+
+	if gotas_recibidas >= gotas_objetivo:
+		ganar()
+
+
+func ganar() -> void:
+	if estado_actual == EstadoJuego.GANADO:
+		return
+
+	estado_actual = EstadoJuego.GANADO
+	partida_terminada = true
+	_detener_spawner()
+	victoria.emit()
+	print("Victoria: llegaron %s de %s gotas requeridas." % [gotas_recibidas, gotas_objetivo])
 
 func _on_generacion_terminada() -> void:
 	if partida_terminada:
@@ -109,11 +125,7 @@ func _on_generacion_terminada() -> void:
 
 
 func _finalizar_con_victoria() -> void:
-	estado_actual = EstadoJuego.GANADO
-	partida_terminada = true
-	_detener_spawner()
-	victoria.emit()
-	print("Victoria: llegaron %s de %s gotas requeridas." % [gotas_recibidas, gotas_objetivo])
+	ganar()
 
 
 func _finalizar_con_derrota() -> void:
