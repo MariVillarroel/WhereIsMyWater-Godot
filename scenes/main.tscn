@@ -55,10 +55,3 @@ offset_bottom = 88.0
 horizontal_alignment = 1
 
 [node name="GameManager" type="Node" parent="." unique_id=1907400234]
-
-[node name="GotaAgua" parent="." unique_id=2108689787 instance=ExtResource("3_sugp2")]
-position = Vector2(175, 17)
-
-[node name="WaterDrop" type="Sprite2D" parent="." unique_id=480080850]
-position = Vector2(2228, 298)
-texture = ExtResource("5_tbgi4")
