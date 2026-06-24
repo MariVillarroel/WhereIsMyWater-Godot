@@ -52,7 +52,6 @@ func _on_gota_recibida(total_recibidas: int) -> void:
 
 	gotas_recibidas = total_recibidas
 	contador_actualizado.emit(gotas_recibidas, objetivo_minimo)
-	print("Gotas recibidas: %s / %s" % [gotas_recibidas, objetivo_minimo])
 
 	if gotas_recibidas >= objetivo_minimo:
 		_finalizar_con_victoria()
