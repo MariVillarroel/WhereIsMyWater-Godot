@@ -25,11 +25,13 @@ script = ExtResource("2_terrain_script")
 
 [node name="AguaContainer" type="Node2D" parent="." unique_id=964992703]
 
+[node name="AguaCanvasGroup" type="CanvasGroup" parent="."]
+
 [node name="SpawnerAgua" type="Node2D" parent="." unique_id=1943864510]
 position = Vector2(160, 96)
 script = ExtResource("4_spawner_script")
 escena_gota = ExtResource("3_sugp2")
-agua_container_path = NodePath("../AguaContainer")
+agua_canvas_group_path = NodePath("../AguaCanvasGroup")
 
 [node name="MetaAgua" type="Area2D" parent="." unique_id=332343085]
 position = Vector2(864, 512)
