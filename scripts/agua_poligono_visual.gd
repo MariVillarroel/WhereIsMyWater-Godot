@@ -1,20 +1,21 @@
 extends Node2D
 
 @export var gotas_group: StringName = &"gotas_agua"
+@export_node_path("TileMapLayer") var terreno_path: NodePath
 @export var color_agua: Color = Color(0.08, 0.65, 0.95, 0.58)
 @export var color_borde: Color = Color(0.72, 0.95, 1.0, 0.22)
 @export var radio_visual: float = 16.0
 @export var radio_borde: float = 21.0
-@export var distancia_union: float = 46.0
-@export var minimo_gotas_cluster: int = 2
-@export var muestras_por_gota: int = 12
-@export var iteraciones_suavizado: int = 2
+@export var tamano_celda_visual: float = 12.0
+@export var margen_tierra: float = 2.0
 @export_range(0.0, 1.0, 0.01) var suavizado_temporal: float = 0.35
 @export var max_gotas_visuales: int = 140
 
-var _clusters: Array[PackedVector2Array] = []
-var _clusters_borde: Array[PackedVector2Array] = []
-var _clusters_previos: Array[PackedVector2Array] = []
+var _rects_agua: Array[Rect2] = []
+var _rects_borde: Array[Rect2] = []
+var _rects_agua_previos: Array[Rect2] = []
+var _rects_borde_previos: Array[Rect2] = []
+@onready var _terreno: TileMapLayer = get_node_or_null(terreno_path)
 
 
 func _process(_delta: float) -> void:
@@ -23,46 +24,39 @@ func _process(_delta: float) -> void:
 
 
 func _draw() -> void:
-	for poligono in _clusters_borde:
-		if poligono.size() >= 3:
-			draw_colored_polygon(poligono, color_borde)
+	for rect in _rects_borde:
+		draw_rect(rect, color_borde, true)
 
-	for poligono in _clusters:
-		if poligono.size() >= 3:
-			draw_colored_polygon(poligono, color_agua)
+	for rect in _rects_agua:
+		draw_rect(rect, color_agua, true)
 
 
 func _actualizar_poligonos() -> void:
-	var clusters_nuevos: Array[PackedVector2Array] = []
-	var bordes_nuevos: Array[PackedVector2Array] = []
+	var rects_agua_nuevos: Array[Rect2] = []
+	var rects_borde_nuevos: Array[Rect2] = []
 
 	var gotas: Array[Vector2] = _obtener_posiciones_gotas()
 	if gotas.is_empty():
-		_clusters.clear()
-		_clusters_borde.clear()
-		_clusters_previos.clear()
+		_rects_agua.clear()
+		_rects_borde.clear()
+		_rects_agua_previos.clear()
+		_rects_borde_previos.clear()
 		return
 
-	var grupos: Array = _crear_clusters(gotas)
-	for grupo in grupos:
-		if grupo.size() < minimo_gotas_cluster:
-			continue
+	var celdas_agua: Dictionary = {}
+	var celdas_borde: Dictionary = {}
 
-		var nube_puntos: PackedVector2Array = _crear_nube_para_grupo(grupo, radio_visual)
-		var contorno: PackedVector2Array = _convex_hull(nube_puntos)
-		contorno = _suavizar_chaikin(contorno, iteraciones_suavizado)
-		if contorno.size() >= 3:
-			clusters_nuevos.append(contorno)
+	for gota in gotas:
+		_agregar_celdas_cercanas(gota, radio_borde, celdas_borde)
+		_agregar_celdas_cercanas(gota, radio_visual, celdas_agua)
 
-		var nube_borde: PackedVector2Array = _crear_nube_para_grupo(grupo, radio_borde)
-		var contorno_borde: PackedVector2Array = _convex_hull(nube_borde)
-		contorno_borde = _suavizar_chaikin(contorno_borde, iteraciones_suavizado)
-		if contorno_borde.size() >= 3:
-			bordes_nuevos.append(contorno_borde)
+	rects_borde_nuevos = _crear_rects_desde_celdas(celdas_borde)
+	rects_agua_nuevos = _crear_rects_desde_celdas(celdas_agua)
 
-	_clusters = _interpolar_clusters(_clusters_previos, clusters_nuevos)
-	_clusters_borde = bordes_nuevos
-	_clusters_previos = _clusters.duplicate()
+	_rects_borde = _interpolar_rects(_rects_borde_previos, rects_borde_nuevos)
+	_rects_agua = _interpolar_rects(_rects_agua_previos, rects_agua_nuevos)
+	_rects_borde_previos = _rects_borde.duplicate()
+	_rects_agua_previos = _rects_agua.duplicate()
 
 
 func _obtener_posiciones_gotas() -> Array[Vector2]:
@@ -80,127 +74,65 @@ func _obtener_posiciones_gotas() -> Array[Vector2]:
 	return posiciones
 
 
-func _crear_clusters(posiciones: Array[Vector2]) -> Array:
-	var grupos: Array = []
-	var visitadas: Array[bool] = []
-	visitadas.resize(posiciones.size())
-	visitadas.fill(false)
+func _agregar_celdas_cercanas(centro: Vector2, radio: float, celdas: Dictionary) -> void:
+	var radio_celdas: int = ceili(radio / tamano_celda_visual)
+	var celda_central: Vector2i = _posicion_a_celda_visual(centro)
 
-	for i in range(posiciones.size()):
-		if visitadas[i]:
-			continue
+	for x in range(celda_central.x - radio_celdas, celda_central.x + radio_celdas + 1):
+		for y in range(celda_central.y - radio_celdas, celda_central.y + radio_celdas + 1):
+			var celda: Vector2i = Vector2i(x, y)
+			var centro_celda: Vector2 = _celda_visual_a_centro(celda)
+			if centro.distance_to(centro_celda) > radio:
+				continue
+			if not _espacio_visual_libre(centro_celda):
+				continue
 
-		var grupo: Array = []
-		var pendientes: Array[int] = [i]
-		visitadas[i] = true
-
-		while not pendientes.is_empty():
-			var indice: int = pendientes.pop_back()
-			var actual: Vector2 = posiciones[indice]
-			grupo.append(actual)
-
-			for j in range(posiciones.size()):
-				if visitadas[j]:
-					continue
-				if actual.distance_to(posiciones[j]) <= distancia_union:
-					visitadas[j] = true
-					pendientes.append(j)
-
-		grupos.append(grupo)
-
-	return grupos
+			celdas[celda] = true
 
 
-func _crear_nube_para_grupo(grupo: Array, radio: float) -> PackedVector2Array:
-	var puntos: PackedVector2Array = PackedVector2Array()
-	var muestras: int = maxi(muestras_por_gota, 6)
+func _crear_rects_desde_celdas(celdas: Dictionary) -> Array[Rect2]:
+	var rects: Array[Rect2] = []
+	var tamano: Vector2 = Vector2(tamano_celda_visual, tamano_celda_visual)
 
-	for centro in grupo:
-		var centro_gota: Vector2 = centro
-		for i in range(muestras):
-			var angulo: float = TAU * float(i) / float(muestras)
-			puntos.append(centro_gota + Vector2(cos(angulo), sin(angulo)) * radio)
+	for celda in celdas.keys():
+		var celda_visual: Vector2i = celda
+		var posicion: Vector2 = Vector2(celda_visual) * tamano_celda_visual
+		rects.append(Rect2(posicion, tamano))
 
-	return puntos
+	return rects
 
 
-func _convex_hull(puntos: PackedVector2Array) -> PackedVector2Array:
-	if puntos.size() <= 3:
-		return puntos
+func _posicion_a_celda_visual(posicion: Vector2) -> Vector2i:
+	return Vector2i(floori(posicion.x / tamano_celda_visual), floori(posicion.y / tamano_celda_visual))
 
-	var ordenados: Array = Array(puntos)
-	ordenados.sort_custom(_ordenar_por_xy)
 
-	var inferior: Array[Vector2] = []
-	for punto in ordenados:
-		while inferior.size() >= 2 and _cross(inferior[-2], inferior[-1], punto) <= 0.0:
-			inferior.pop_back()
-		inferior.append(punto)
+func _celda_visual_a_centro(celda: Vector2i) -> Vector2:
+	return (Vector2(celda) + Vector2(0.5, 0.5)) * tamano_celda_visual
 
-	var superior: Array[Vector2] = []
-	for i in range(ordenados.size() - 1, -1, -1):
-		var punto: Vector2 = ordenados[i]
-		while superior.size() >= 2 and _cross(superior[-2], superior[-1], punto) <= 0.0:
-			superior.pop_back()
-		superior.append(punto)
 
-	inferior.pop_back()
-	superior.pop_back()
+func _espacio_visual_libre(posicion_local: Vector2) -> bool:
+	if _terreno == null:
+		return true
 
-	var resultado: PackedVector2Array = PackedVector2Array()
-	for punto in inferior:
-		resultado.append(punto)
-	for punto in superior:
-		resultado.append(punto)
+	var global: Vector2 = to_global(posicion_local)
+	var posicion_terreno: Vector2 = _terreno.to_local(global)
+	var celda_terreno: Vector2i = _terreno.local_to_map(posicion_terreno)
+	if _terreno.get_cell_source_id(celda_terreno) == -1:
+		return true
+
+	var centro_tile: Vector2 = _terreno.to_global(_terreno.map_to_local(celda_terreno))
+	return global.distance_to(centro_tile) > 16.0 + margen_tierra
+
+
+func _interpolar_rects(previos: Array[Rect2], nuevos: Array[Rect2]) -> Array[Rect2]:
+	if previos.is_empty() or previos.size() != nuevos.size():
+		return nuevos
+
+	var resultado: Array[Rect2] = []
+	for i in range(nuevos.size()):
+		var rect_previo: Rect2 = previos[i]
+		var rect_nuevo: Rect2 = nuevos[i]
+		var posicion: Vector2 = rect_previo.position.lerp(rect_nuevo.position, suavizado_temporal)
+		resultado.append(Rect2(posicion, rect_nuevo.size))
 
 	return resultado
-
-
-func _suavizar_chaikin(puntos: PackedVector2Array, iteraciones: int) -> PackedVector2Array:
-	var resultado: PackedVector2Array = puntos
-	var repeticiones: int = maxi(iteraciones, 0)
-
-	for _i in range(repeticiones):
-		if resultado.size() < 3:
-			return resultado
-
-		var suavizado: PackedVector2Array = PackedVector2Array()
-		for i in range(resultado.size()):
-			var actual: Vector2 = resultado[i]
-			var siguiente: Vector2 = resultado[(i + 1) % resultado.size()]
-			suavizado.append(actual.lerp(siguiente, 0.25))
-			suavizado.append(actual.lerp(siguiente, 0.75))
-
-		resultado = suavizado
-
-	return resultado
-
-
-func _interpolar_clusters(previos: Array[PackedVector2Array], nuevos: Array[PackedVector2Array]) -> Array[PackedVector2Array]:
-	var resultado: Array[PackedVector2Array] = []
-	var cantidad: int = nuevos.size()
-
-	for i in range(cantidad):
-		var nuevo: PackedVector2Array = nuevos[i]
-		if i >= previos.size() or previos[i].size() != nuevo.size():
-			resultado.append(nuevo)
-			continue
-
-		var anterior: PackedVector2Array = previos[i]
-		var interpolado: PackedVector2Array = PackedVector2Array()
-		for j in range(nuevo.size()):
-			interpolado.append(anterior[j].lerp(nuevo[j], suavizado_temporal))
-
-		resultado.append(interpolado)
-
-	return resultado
-
-
-func _ordenar_por_xy(a: Vector2, b: Vector2) -> bool:
-	if is_equal_approx(a.x, b.x):
-		return a.y < b.y
-	return a.x < b.x
-
-
-func _cross(origen: Vector2, a: Vector2, b: Vector2) -> float:
-	return (a - origen).cross(b - origen)

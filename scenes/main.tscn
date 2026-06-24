@@ -30,6 +30,7 @@ script = ExtResource("2_terrain_script")
 
 [node name="AguaPoligonoVisual" type="Node2D" parent="."]
 script = ExtResource("11_agua_poligono_script")
+terreno_path = NodePath("../Terreno")
 
 [node name="SpawnerAgua" type="Node2D" parent="." unique_id=1943864510]
 position = Vector2(160, 96)
