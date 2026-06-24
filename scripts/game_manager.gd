@@ -77,8 +77,21 @@ func _on_gota_generada(cantidad_generada: int) -> void:
 	gotas_generadas = cantidad_generada
 
 
+func registrar_gota_recibida() -> int:
+	if not puede_jugar():
+		return gotas_recibidas
+
+	gotas_recibidas += 1
+	contador_actualizado.emit(gotas_recibidas, gotas_objetivo)
+
+	if gotas_recibidas >= gotas_objetivo:
+		_finalizar_con_victoria()
+
+	return gotas_recibidas
+
+
 func _on_gota_recibida(total_recibidas: int) -> void:
-	if partida_terminada:
+	if partida_terminada or total_recibidas <= gotas_recibidas:
 		return
 
 	gotas_recibidas = total_recibidas
