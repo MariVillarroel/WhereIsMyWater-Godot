@@ -9,7 +9,7 @@
 [ext_resource type="Script" uid="uid://hgv756ktmami" path="res://scripts/game_manager.gd" id="8_game_manager_script"]
 [ext_resource type="Script" uid="uid://ddaqrm8cjj0sg" path="res://scripts/ui_manager.gd" id="9_ui_manager_script"]
 [ext_resource type="Script" uid="uid://ipdpspute3ak" path="res://scripts/zona_perdida.gd" id="10_zona_perdida_script"]
-[ext_resource type="Script" path="res://scripts/agua_poligono_visual.gd" id="11_agua_poligono_script"]
+[ext_resource type="Script" uid="uid://jd4patgn2nh2" path="res://scripts/agua_poligono_visual.gd" id="11_agua_poligono_script"]
 [ext_resource type="Material" path="res://materials/agua_visual_poligono.tres" id="12_agua_visual_material"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_meta"]
@@ -29,7 +29,7 @@ script = ExtResource("2_terrain_script")
 
 [node name="AguaCanvasGroup" type="CanvasGroup" parent="." unique_id=581249465]
 
-[node name="AguaPoligonoVisual" type="Node2D" parent="."]
+[node name="AguaPoligonoVisual" type="Node2D" parent="." unique_id=1404907777]
 material = ExtResource("12_agua_visual_material")
 script = ExtResource("11_agua_poligono_script")
 terreno_path = NodePath("../Terreno")
@@ -39,6 +39,7 @@ position = Vector2(160, 96)
 script = ExtResource("4_spawner_script")
 escena_gota = ExtResource("3_sugp2")
 agua_canvas_group_path = NodePath("../AguaCanvasGroup")
+game_manager_path = NodePath("../GameManager")
 
 [node name="MetaAgua" type="Area2D" parent="." unique_id=332343085]
 position = Vector2(864, 512)
@@ -84,3 +85,4 @@ horizontal_alignment = 1
 script = ExtResource("8_game_manager_script")
 spawner_path = NodePath("../SpawnerAgua")
 meta_path = NodePath("../MetaAgua")
+gotas_totales = 5
