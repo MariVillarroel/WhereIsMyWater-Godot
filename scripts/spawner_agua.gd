@@ -5,7 +5,7 @@ signal generacion_terminada
 
 @export var escena_gota: PackedScene
 @export_node_path("CanvasGroup") var agua_canvas_group_path: NodePath
-@export var gotas_totales: int = 200
+@export var gotas_totales: int = 100
 @export var intervalo_generacion: float = 0.08
 @export var variacion_horizontal: float = 10.0
 

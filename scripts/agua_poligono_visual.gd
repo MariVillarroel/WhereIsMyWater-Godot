@@ -23,18 +23,19 @@ var _rects_borde_previos: Array[Rect2] = []
 
 
 func _ready() -> void:
-	_actualizar_visibilidad_gotas()
+	_actualizar_visibilidad_gotas(_obtener_gotas())
 
 
 func _process(_delta: float) -> void:
-	_actualizar_visibilidad_gotas()
+	var gotas: Array[Node2D] = _obtener_gotas()
+	_actualizar_visibilidad_gotas(gotas)
 
 	if debug_visual_simple:
 		_limpiar_visual()
 		queue_redraw()
 		return
 
-	_actualizar_poligonos()
+	_actualizar_poligonos(gotas)
 	queue_redraw()
 
 
@@ -46,12 +47,11 @@ func _draw() -> void:
 		draw_rect(rect, color_agua, true)
 
 
-func _actualizar_poligonos() -> void:
+func _actualizar_poligonos(gotas_nodos: Array[Node2D]) -> void:
 	var rects_agua_nuevos: Array[Rect2] = []
 	var rects_borde_nuevos: Array[Rect2] = []
 
-	var gotas: Array[Vector2] = _obtener_posiciones_gotas()
-	if gotas.is_empty():
+	if gotas_nodos.is_empty():
 		_rects_agua.clear()
 		_rects_borde.clear()
 		_rects_agua_previos.clear()
@@ -61,9 +61,10 @@ func _actualizar_poligonos() -> void:
 	var celdas_agua: Dictionary = {}
 	var celdas_borde: Dictionary = {}
 
-	for gota in gotas:
-		_agregar_celdas_cercanas(gota, radio_borde, celdas_borde)
-		_agregar_celdas_cercanas(gota, radio_visual, celdas_agua)
+	for gota in gotas_nodos:
+		var posicion: Vector2 = to_local(gota.global_position)
+		_agregar_celdas_cercanas(posicion, radio_borde, celdas_borde)
+		_agregar_celdas_cercanas(posicion, radio_visual, celdas_agua)
 
 	rects_borde_nuevos = _crear_rects_desde_celdas(celdas_borde)
 	rects_agua_nuevos = _crear_rects_desde_celdas(celdas_agua)
@@ -81,34 +82,30 @@ func _limpiar_visual() -> void:
 	_rects_borde_previos.clear()
 
 
-func _actualizar_visibilidad_gotas() -> void:
+func _actualizar_visibilidad_gotas(gotas_nodos: Array[Node2D]) -> void:
 	var alpha: float = alpha_gotas_debug if debug_visual_simple else alpha_gotas_visual
-	var nodos: Array[Node] = get_tree().get_nodes_in_group(gotas_group)
 
-	for nodo in nodos:
-		if not (nodo is Node2D) or nodo.is_queued_for_deletion():
-			continue
-
-		var sprite: Sprite2D = (nodo as Node2D).get_node_or_null("Sprite2D")
+	for gota in gotas_nodos:
+		var sprite: Sprite2D = gota.get_node_or_null("Sprite2D")
 		if sprite == null:
 			continue
 
 		sprite.modulate.a = alpha
 
 
-func _obtener_posiciones_gotas() -> Array[Vector2]:
-	var posiciones: Array[Vector2] = []
+func _obtener_gotas() -> Array[Node2D]:
+	var gotas: Array[Node2D] = []
 	var nodos: Array[Node] = get_tree().get_nodes_in_group(gotas_group)
 
 	for nodo in nodos:
-		if posiciones.size() >= max_gotas_visuales:
+		if gotas.size() >= max_gotas_visuales:
 			break
 		if not (nodo is Node2D) or nodo.is_queued_for_deletion():
 			continue
 
-		posiciones.append(to_local((nodo as Node2D).global_position))
+		gotas.append(nodo as Node2D)
 
-	return posiciones
+	return gotas
 
 
 func _agregar_celdas_cercanas(centro: Vector2, radio: float, celdas: Dictionary) -> void:
