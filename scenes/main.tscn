@@ -86,4 +86,5 @@ horizontal_alignment = 1
 script = ExtResource("8_game_manager_script")
 spawner_path = NodePath("../SpawnerAgua")
 meta_path = NodePath("../MetaAgua")
+gotas_totales = 5
 gotas_objetivo = 1

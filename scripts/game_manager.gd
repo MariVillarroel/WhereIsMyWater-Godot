@@ -57,13 +57,7 @@ func _process(_delta: float) -> void:
 	if partida_terminada or not generacion_terminada:
 		return
 
-	var gotas_activas := get_tree().get_nodes_in_group("gotas_agua").filter(
-		func(gota: Node) -> bool:
-			return not gota.is_queued_for_deletion()
-	).size()
-
-	if gotas_recibidas + gotas_activas < gotas_objetivo:
-		_finalizar_con_derrota()
+	evaluar_estado()
 
 
 func registrar_gota_generada() -> void:
@@ -83,7 +77,6 @@ func registrar_gota_recibida() -> int:
 
 	gotas_recibidas += 1
 	contador_actualizado.emit(gotas_recibidas, gotas_objetivo)
-
 	evaluar_estado()
 
 	return gotas_recibidas
@@ -95,7 +88,6 @@ func _on_gota_recibida(total_recibidas: int) -> void:
 
 	gotas_recibidas = total_recibidas
 	contador_actualizado.emit(gotas_recibidas, gotas_objetivo)
-
 	evaluar_estado()
 
 
@@ -105,6 +97,19 @@ func evaluar_estado() -> void:
 
 	if gotas_recibidas >= gotas_objetivo:
 		ganar()
+		return
+
+	if gotas_recibidas + obtener_gotas_restantes() < gotas_objetivo:
+		perder()
+
+
+func obtener_gotas_restantes() -> int:
+	var gotas_activas := get_tree().get_nodes_in_group("gotas_agua").filter(
+		func(gota: Node) -> bool:
+			return not gota.is_queued_for_deletion()
+	).size()
+	var gotas_por_generar = max(gotas_totales - gotas_generadas, 0)
+	return gotas_activas + gotas_por_generar
 
 
 func ganar() -> void:
@@ -117,11 +122,24 @@ func ganar() -> void:
 	victoria.emit()
 	print("Victoria: llegaron %s de %s gotas requeridas." % [gotas_recibidas, gotas_objetivo])
 
+
+func perder() -> void:
+	if estado_actual == EstadoJuego.PERDIDO:
+		return
+
+	estado_actual = EstadoJuego.PERDIDO
+	partida_terminada = true
+	_detener_spawner()
+	derrota.emit()
+	print("Derrota: llegaron %s de %s gotas requeridas." % [gotas_recibidas, gotas_objetivo])
+
+
 func _on_generacion_terminada() -> void:
 	if partida_terminada:
 		return
 
 	generacion_terminada = true
+	evaluar_estado()
 
 
 func _finalizar_con_victoria() -> void:
@@ -129,11 +147,7 @@ func _finalizar_con_victoria() -> void:
 
 
 func _finalizar_con_derrota() -> void:
-	estado_actual = EstadoJuego.PERDIDO
-	partida_terminada = true
-	_detener_spawner()
-	derrota.emit()
-	print("Derrota: llegaron %s de %s gotas requeridas." % [gotas_recibidas, gotas_objetivo])
+	perder()
 
 
 func _detener_spawner() -> void:
