@@ -52,7 +52,9 @@ func _on_body_entered(body: Node2D) -> void:
 	_eliminar_gota(body)
 
 func _puede_recibir_gota() -> bool:
-	return true
+	if _game_manager == null or not _game_manager.has_method("puede_jugar"):
+		return true
+	return _game_manager.puede_jugar()
 
 func _eliminar_gota(body: Node2D) -> void:
 	if body.has_method("eliminar"):

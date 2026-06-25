@@ -14,11 +14,17 @@ enum EstadoJuego {
 
 @export_node_path("Node") var spawner_path: NodePath
 @export_node_path("Area2D") var meta_path: NodePath
+const CONFIG_NIVELES := {
+	1: {"gotas_totales": 80, "gotas_objetivo": 30},
+	2: {"gotas_totales": 99, "gotas_objetivo": 50},
+}
+
 @export var nombre_nivel: String = "Nivel 1"
 @export var numero_nivel: int = 1
-@export var gotas_totales: int = 100
-@export var gotas_objetivo: int = 20
 @export var siguiente_nivel: PackedScene
+
+var gotas_totales := 80
+var gotas_objetivo := 30
 
 var estado_actual: EstadoJuego = EstadoJuego.PREPARANDO
 var gotas_generadas := 0
@@ -31,6 +37,8 @@ var generacion_terminada := false
 
 
 func _ready() -> void:
+	_aplicar_configuracion_nivel()
+
 	if _spawner != null:
 		_spawner.gota_generada.connect(_on_gota_generada)
 		_spawner.generacion_terminada.connect(_on_generacion_terminada)
@@ -39,6 +47,12 @@ func _ready() -> void:
 		_meta.gota_recibida.connect(_on_gota_recibida)
 
 	iniciar_nivel()
+
+
+func _aplicar_configuracion_nivel() -> void:
+	var config: Dictionary = CONFIG_NIVELES.get(numero_nivel, CONFIG_NIVELES[1])
+	gotas_totales = int(config["gotas_totales"])
+	gotas_objetivo = int(config["gotas_objetivo"])
 
 
 func iniciar_nivel() -> void:
@@ -78,6 +92,8 @@ func _on_gota_generada(cantidad_generada: int) -> void:
 
 
 func registrar_gota_recibida() -> int:
+	if not puede_jugar():
+		return gotas_recibidas
 
 	gotas_recibidas += 1
 	_emit_progreso()

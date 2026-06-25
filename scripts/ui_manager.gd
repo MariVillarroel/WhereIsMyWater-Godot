@@ -7,6 +7,8 @@ extends CanvasLayer
 @export_node_path("Button") var boton_siguiente_nivel_path: NodePath
 @export_node_path("Button") var boton_reiniciar_derrota_path: NodePath
 
+const RESTART_TEXTURE := preload("res://assets/ui/restart.png")
+
 @onready var _game_manager: Node = get_node_or_null(game_manager_path)
 @onready var _panel_victoria: Panel = get_node_or_null(panel_victoria_path)
 @onready var _panel_derrota: Panel = get_node_or_null(panel_derrota_path)
@@ -19,6 +21,7 @@ var _hud_root: Control
 var _hud_main: HudMain
 var _hud_counter: HudCounter
 var _hud_level: HudLevel
+var _boton_reiniciar_hud: Button
 
 const VIEWPORT_WIDTH := 1000.0
 const HUD_TOP := 12.0
@@ -26,6 +29,7 @@ const HUD_SIDE := 16.0
 const HUD_GAP := 10.0
 const HUD_LEVEL_WIDTH := 88.0
 const HUD_COUNTER_WIDTH := 103.0
+const HUD_RESTART_WIDTH := 137.0
 
 func _ready() -> void:
 	get_tree().root.size_changed.connect(_on_viewport_resized)
@@ -57,12 +61,7 @@ func _process(_delta: float) -> void:
 
 
 func _on_viewport_resized() -> void:
-	var w := get_viewport().get_visible_rect().size.x
-	if _hud_level != null:
-		_hud_level.position.x = w - HUD_SIDE - HUD_LEVEL_WIDTH
-	if _hud_counter != null:
-		var level_x := w - HUD_SIDE - HUD_LEVEL_WIDTH
-		_hud_counter.position.x = level_x - HUD_GAP - HUD_COUNTER_WIDTH
+	_layout_hud_derecho()
 
 func actualizar_progreso(
 	gotas_recibidas: int,
@@ -146,6 +145,9 @@ func _conectar_botones() -> void:
 	if _boton_siguiente_nivel != null:
 		_boton_siguiente_nivel.pressed.connect(_on_siguiente_nivel_pressed)
 
+	if _boton_reiniciar_hud != null:
+		_boton_reiniciar_hud.pressed.connect(_on_reiniciar_pressed)
+
 
 func _on_reiniciar_pressed() -> void:
 	if _game_manager != null and _game_manager.has_method("reiniciar_nivel"):
@@ -161,19 +163,9 @@ func _actualizar_boton_siguiente_nivel() -> void:
 	if _boton_siguiente_nivel == null or _game_manager == null:
 		return
 
-	print("================================")
-	print("PackedScene:", _game_manager.siguiente_nivel)
-	print("Visible:", _boton_siguiente_nivel.visible)
-	print("Disabled:", _boton_siguiente_nivel.disabled)
-	print("================================")
-
 	var tiene_siguiente_nivel: bool = _game_manager.get("siguiente_nivel") != null
 	_boton_siguiente_nivel.visible = tiene_siguiente_nivel
 	_boton_siguiente_nivel.disabled = not tiene_siguiente_nivel
-
-	print("Después:")
-	print("Visible:", _boton_siguiente_nivel.visible)
-	print("Disabled:", _boton_siguiente_nivel.disabled)
 
 func _crear_interfaz() -> void:
 
@@ -188,8 +180,10 @@ func _crear_interfaz() -> void:
 	add_child(_hud_root)
 
 	_crear_hud_principal()
+	_crear_boton_reinicio_hud()
 	_crear_hud_counter()
 	_crear_hud_level()
+	_layout_hud_derecho()
 
 	if _panel_victoria != null:
 		_panel_victoria.set_script(preload("res://scripts/ui/victory_panel.gd"))
@@ -200,6 +194,58 @@ func _crear_interfaz() -> void:
 		_panel_derrota.set_script(preload("res://scripts/ui/defeat_panel.gd"))
 		if _panel_derrota.has_method("inicializar"):
 			_panel_derrota.inicializar()
+
+func _crear_boton_reinicio_hud() -> void:
+	_boton_reiniciar_hud = Button.new()
+	_boton_reiniciar_hud.name = "BotonReiniciarHud"
+	_estilizar_boton_textura(_boton_reiniciar_hud, RESTART_TEXTURE)
+	_hud_root.add_child(_boton_reiniciar_hud)
+
+
+func _estilizar_boton_textura(button: Button, texture: Texture2D) -> void:
+	button.text = ""
+	button.flat = false
+	button.mouse_filter = Control.MOUSE_FILTER_STOP
+	button.custom_minimum_size = texture.get_size()
+	button.size = texture.get_size()
+
+	var normal := StyleBoxTexture.new()
+	normal.texture = texture
+	normal.draw_center = true
+
+	var hover := StyleBoxTexture.new()
+	hover.texture = texture
+	hover.draw_center = true
+	hover.modulate_color = Color(1.12, 1.12, 1.12)
+
+	var pressed := StyleBoxTexture.new()
+	pressed.texture = texture
+	pressed.draw_center = true
+	pressed.modulate_color = Color(0.88, 0.88, 0.88)
+
+	button.add_theme_stylebox_override("normal", normal)
+	button.add_theme_stylebox_override("hover", hover)
+	button.add_theme_stylebox_override("pressed", pressed)
+	button.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+
+
+func _layout_hud_derecho() -> void:
+	var w := get_viewport().get_visible_rect().size.x
+	var next_x := w - HUD_SIDE
+
+	if _boton_reiniciar_hud != null:
+		next_x -= HUD_RESTART_WIDTH
+		_boton_reiniciar_hud.position = Vector2(next_x, HUD_TOP)
+		next_x -= HUD_GAP
+
+	if _hud_level != null:
+		next_x -= HUD_LEVEL_WIDTH
+		_hud_level.position.x = next_x
+		next_x -= HUD_GAP
+
+	if _hud_counter != null:
+		next_x -= HUD_COUNTER_WIDTH
+		_hud_counter.position.x = next_x
 
 func _crear_hud_principal() -> void:
 
@@ -212,13 +258,7 @@ func _crear_hud_principal() -> void:
 func _crear_hud_counter() -> void:
 
 	_hud_counter = HudCounter.new()
-
-	var w := get_viewport().get_visible_rect().size.x
-	var level_x := w - HUD_SIDE - HUD_LEVEL_WIDTH
-	_hud_counter.position = Vector2(
-		level_x - HUD_GAP - HUD_COUNTER_WIDTH,
-		HUD_TOP
-	)
+	_hud_counter.position = Vector2(0, HUD_TOP)
 
 	_hud_root.add_child(
 		_hud_counter
@@ -226,12 +266,7 @@ func _crear_hud_counter() -> void:
 func _crear_hud_level() -> void:
 
 	_hud_level = HudLevel.new()
-
-	var w := get_viewport().get_visible_rect().size.x
-	_hud_level.position = Vector2(
-		w - HUD_SIDE - HUD_LEVEL_WIDTH,
-		HUD_TOP
-	)
+	_hud_level.position = Vector2(0, HUD_TOP)
 
 	_hud_root.add_child(
 		_hud_level

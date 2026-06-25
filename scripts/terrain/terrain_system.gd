@@ -92,10 +92,13 @@ func _ready() -> void:
 	_rasterizer = TerrainRasterizer.new()
 
 	var image := _rasterizer.rasterize(_terrain)
+	var locked_image := Image.create(image.get_width(), image.get_height(), false, Image.FORMAT_RGBA8)
+	locked_image.fill(Color.TRANSPARENT)
 
 	var additions = get_tree().get_nodes_in_group("terrain_additions")
 	var erasers = get_tree().get_nodes_in_group("terrain_erasers")
-	
+	var blockers = get_tree().get_nodes_in_group("terrain_blockers")
+
 	for eraser in erasers:
 		if eraser is Sprite2D and eraser.texture != null:
 			var tex_size = eraser.texture.get_size()
@@ -114,21 +117,44 @@ func _ready() -> void:
 					tex_img.decompress()
 				if tex_img.get_format() != Image.FORMAT_RGBA8:
 					tex_img.convert(Image.FORMAT_RGBA8)
-				
+
 				if add.scale != Vector2.ONE:
-					var new_w = max(1, int(tex_img.get_width() * add.scale.x))
-					var new_h = max(1, int(tex_img.get_height() * add.scale.y))
+					var new_w = max(1, int(tex_img.get_width() * abs(add.scale.x)))
+					var new_h = max(1, int(tex_img.get_height() * abs(add.scale.y)))
 					tex_img.resize(new_w, new_h, Image.INTERPOLATE_BILINEAR)
-				
+
 				var local_pos = _terrain.to_local(add.global_position) - _terrain_origin_local()
 				var tex_size = tex_img.get_size()
 				var dest = local_pos - (Vector2(tex_size) / 2.0)
-				
+
 				image.blend_rect(tex_img, Rect2i(Vector2i.ZERO, tex_size), Vector2i(round(dest.x), round(dest.y)))
 				add.visible = false
 
+	for blocker in blockers:
+		if blocker is Sprite2D and blocker.texture != null:
+			var tex_img = blocker.texture.get_image()
+			if tex_img != null:
+				if tex_img.is_compressed():
+					tex_img.decompress()
+				if tex_img.get_format() != Image.FORMAT_RGBA8:
+					tex_img.convert(Image.FORMAT_RGBA8)
+
+				if blocker.scale != Vector2.ONE:
+					var new_w = max(1, int(tex_img.get_width() * abs(blocker.scale.x)))
+					var new_h = max(1, int(tex_img.get_height() * abs(blocker.scale.y)))
+					tex_img.resize(new_w, new_h, Image.INTERPOLATE_BILINEAR)
+
+				var local_pos = _terrain.to_local(blocker.global_position) - _terrain_origin_local()
+				var tex_size = tex_img.get_size()
+				var dest = local_pos - (Vector2(tex_size) / 2.0)
+				var dest_i := Vector2i(round(dest.x), round(dest.y))
+
+				image.blend_rect(tex_img, Rect2i(Vector2i.ZERO, tex_size), dest_i)
+				locked_image.blend_rect(tex_img, Rect2i(Vector2i.ZERO, tex_size), dest_i)
+				blocker.visible = false
+
 	_mask = TerrainMask.new()
-	_mask.setup(image)
+	_mask.setup(image, locked_image)
 
 	_visual.set_image(image)
 	_visual.position = _terrain_origin_local()

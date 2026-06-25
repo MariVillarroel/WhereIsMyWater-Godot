@@ -11,13 +11,16 @@ extends RefCounted
 ## de la colisión hay que reconstruir.
 
 var _image: Image
+var _locked_image: Image
 
 
 func setup(
-	image: Image
+	image: Image,
+	locked_image: Image = null
 ) -> void:
 
 	_image = image
+	_locked_image = locked_image
 
 
 func erase_circle(
@@ -47,6 +50,8 @@ func erase_circle(
 	if min_x > max_x or min_y > max_y:
 		return Rect2i()
 
+	var erased := false
+
 	for y in range(min_y, max_y + 1):
 
 		var dy := y - center_i.y
@@ -58,7 +63,14 @@ func erase_circle(
 			if float(dx * dx + dy * dy) > radius_squared:
 				continue
 
+			if _is_locked(x, y):
+				continue
+
 			_image.set_pixel(x, y, Color.TRANSPARENT)
+			erased = true
+
+	if not erased:
+		return Rect2i()
 
 	return Rect2i(
 		min_x,
@@ -66,7 +78,6 @@ func erase_circle(
 		max_x - min_x + 1,
 		max_y - min_y + 1
 	)
-
 
 func erase_rect(
 	rect: Rect2i
@@ -87,10 +98,20 @@ func erase_rect(
 	if clipped.size.x <= 0 or clipped.size.y <= 0:
 		return Rect2i()
 
-	_image.fill_rect(clipped, Color.TRANSPARENT)
+	var erased := false
+
+	for y in range(clipped.position.y, clipped.end.y):
+		for x in range(clipped.position.x, clipped.end.x):
+			if _is_locked(x, y):
+				continue
+
+			_image.set_pixel(x, y, Color.TRANSPARENT)
+			erased = true
+
+	if not erased:
+		return Rect2i()
 
 	return clipped
-
 
 func is_solid(
 	x: int,
@@ -108,6 +129,23 @@ func is_solid(
 
 	return _image.get_pixel(x, y).a >= 0.5
 
+
+
+func _is_locked(
+	x: int,
+	y: int
+) -> bool:
+
+	if _locked_image == null:
+		return false
+
+	if x < 0 or y < 0:
+		return false
+
+	if x >= _locked_image.get_width() or y >= _locked_image.get_height():
+		return false
+
+	return _locked_image.get_pixel(x, y).a >= 0.5
 
 func image() -> Image:
 	return _image

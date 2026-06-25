@@ -14,6 +14,8 @@
 [ext_resource type="Material" path="res://materials/agua_visual_poligono.tres" id="12_agua_visual_material"]
 [ext_resource type="Script" uid="uid://x2jtqepvybkm" path="res://scripts/ui/fondo_juego.gd" id="14_fondo_script"]
 [ext_resource type="PackedScene" path="res://scenes/goal_zone.tscn" id="15_goal_zone"]
+[ext_resource type="Texture2D" uid="uid://3uo27kpaubrn" path="res://assets/ui/roca.png.png" id="16_roca_obstaculo"]
+[ext_resource type="Texture2D" uid="uid://dkj650adbucti" path="res://assets/ui/huesos.png.png" id="17_huesos_obstaculo"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_zona_perdida"]
 size = Vector2(1400, 120)
@@ -46,6 +48,25 @@ script = ExtResource("5_shr66")
 [node name="TerrainCollision" type="StaticBody2D" parent="TerrainSystem" unique_id=673956983]
 script = ExtResource("6_3h30w")
 
+[node name="RocaBloqueo01" type="Sprite2D" parent="TerrainSystem" groups=["terrain_blockers"]]
+position = Vector2(670, 320)
+scale = Vector2(0.09, 0.09)
+texture = ExtResource("16_roca_obstaculo")
+
+[node name="HuesosBloqueo01" type="Sprite2D" parent="TerrainSystem" groups=["terrain_blockers"]]
+position = Vector2(430, 500)
+scale = Vector2(0.08, 0.08)
+texture = ExtResource("17_huesos_obstaculo")
+
+[node name="RocaBloqueo02" type="Sprite2D" parent="TerrainSystem" groups=["terrain_blockers"]]
+position = Vector2(780, 535)
+scale = Vector2(0.075, 0.075)
+texture = ExtResource("16_roca_obstaculo")
+
+[node name="HuesosBloqueo02" type="Sprite2D" parent="TerrainSystem" groups=["terrain_blockers"]]
+position = Vector2(285, 610)
+scale = Vector2(0.07, 0.07)
+texture = ExtResource("17_huesos_obstaculo")
 [node name="AguaCanvasGroup" type="CanvasGroup" parent="." unique_id=298632946]
 
 [node name="AguaPoligonoVisual" type="Node2D" parent="." unique_id=575986410]
@@ -165,5 +186,3 @@ spawner_path = NodePath("../SpawnerAgua")
 meta_path = NodePath("../GoalZone")
 nombre_nivel = "Nivel 2"
 numero_nivel = 2
-gotas_totales = 99
-gotas_objetivo = 50

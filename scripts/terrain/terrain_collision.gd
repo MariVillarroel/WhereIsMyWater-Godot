@@ -30,6 +30,7 @@ var _polygon_pool: Array[CollisionPolygon2D] = []
 func _ready() -> void:
 	var mat = PhysicsMaterial.new()
 	mat.friction = 0.0
+	mat.bounce = 0.2
 	physics_material_override = mat
 
 

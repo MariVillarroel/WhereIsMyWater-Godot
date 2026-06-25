@@ -8,7 +8,7 @@ radius = 4.5
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_drop"]
 friction = 0.0
-bounce = 0.0
+bounce = 0.35
 
 [node name="GotaAgua" type="RigidBody2D"]
 collision_layer = 2
