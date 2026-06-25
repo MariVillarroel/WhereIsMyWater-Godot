@@ -1,0 +1,36 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/goal_zone.gd" id="1_goal_zone_script"]
+[ext_resource type="Texture2D" path="res://assets/ui/goal_zone.png" id="2_bg_tex"]
+[ext_resource type="Texture2D" path="res://assets/ui/plant_death.png" id="3_plant_tex"]
+[ext_resource type="Texture2D" path="res://assets/ui/water_bubble_text.png" id="4_bubble_tex"]
+[ext_resource type="Texture2D" path="res://assets/ui/goal_zone_border.png" id="5_border_tex"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_goal"]
+size = Vector2(80, 60)
+
+[node name="GoalZone" type="Area2D"]
+collision_mask = 2
+script = ExtResource("1_goal_zone_script")
+
+[node name="BorderSprite" type="Sprite2D" parent="." groups=["terrain_additions"]]
+scale = Vector2(0.328, 0.327)
+texture = ExtResource("5_border_tex")
+
+[node name="Background" type="Sprite2D" parent="." groups=["terrain_erasers"]]
+scale = Vector2(0.33, 0.328)
+texture = ExtResource("2_bg_tex")
+
+[node name="PlantSprite" type="Sprite2D" parent="."]
+position = Vector2(0, 24)
+scale = Vector2(0.606, 0.651)
+texture = ExtResource("3_plant_tex")
+
+[node name="BubbleSprite" type="Sprite2D" parent="."]
+position = Vector2(0, -52)
+scale = Vector2(0.11, 0.11)
+texture = ExtResource("4_bubble_tex")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 28)
+shape = SubResource("RectangleShape2D_goal")

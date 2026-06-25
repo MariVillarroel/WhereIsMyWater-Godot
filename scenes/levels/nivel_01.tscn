@@ -7,8 +7,6 @@
 [ext_resource type="Script" uid="uid://mwmva1obepvi" path="res://scripts/spawner_agua.gd" id="4_spawner_script"]
 [ext_resource type="Script" uid="uid://b7ddnmwycfifw" path="res://scripts/terrain/terrain_visual.gd" id="5_shr66"]
 [ext_resource type="Script" uid="uid://bahfjvfx0tru3" path="res://scripts/terrain/terrain_collision.gd" id="6_3h30w"]
-[ext_resource type="Script" uid="uid://bcl6qwom6r0d1" path="res://scripts/meta_agua.gd" id="6_meta_script"]
-[ext_resource type="Texture2D" uid="uid://bxo37yn5qttwy" path="res://assets/goal_zone.svg" id="7_goal_texture"]
 [ext_resource type="Script" uid="uid://hgv756ktmami" path="res://scripts/game_manager.gd" id="8_game_manager_script"]
 [ext_resource type="Script" uid="uid://ddaqrm8cjj0sg" path="res://scripts/ui_manager.gd" id="9_ui_manager_script"]
 [ext_resource type="Script" uid="uid://ipdpspute3ak" path="res://scripts/zona_perdida.gd" id="10_zona_perdida_script"]
@@ -16,9 +14,7 @@
 [ext_resource type="Material" path="res://materials/agua_visual_poligono.tres" id="12_agua_visual_material"]
 [ext_resource type="PackedScene" uid="uid://buiq3m8dic771" path="res://scenes/levels/nivel_02.tscn" id="13_nivel_02"]
 [ext_resource type="Script" uid="uid://x2jtqepvybkm" path="res://scripts/ui/fondo_juego.gd" id="14_fondo_script"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_meta"]
-size = Vector2(96, 96)
+[ext_resource type="PackedScene" path="res://scenes/goal_zone.tscn" id="15_goal_zone"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_zona_perdida"]
 size = Vector2(1400, 120)
@@ -28,6 +24,10 @@ size = Vector2(1400, 120)
 [node name="Fondo" type="CanvasLayer" parent="." unique_id=1538511904]
 layer = -10
 script = ExtResource("14_fondo_script")
+
+[node name="GoalZone" parent="." unique_id=1651809791 instance=ExtResource("15_goal_zone")]
+position = Vector2(864, 512)
+game_manager_path = NodePath("../GameManager")
 
 [node name="TerrainSystem" type="Node2D" parent="." unique_id=1341092476]
 script = ExtResource("2_4t8up")
@@ -61,17 +61,6 @@ escena_gota = ExtResource("3_sugp2")
 agua_canvas_group_path = NodePath("../AguaCanvasGroup")
 game_manager_path = NodePath("../GameManager")
 
-[node name="MetaAgua" type="Area2D" parent="." unique_id=1669614067]
-position = Vector2(864, 512)
-collision_mask = 2
-script = ExtResource("6_meta_script")
-game_manager_path = NodePath("../GameManager")
-
-[node name="Sprite2D" type="Sprite2D" parent="MetaAgua" unique_id=557242354]
-texture = ExtResource("7_goal_texture")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MetaAgua" unique_id=1861912919]
-shape = SubResource("RectangleShape2D_meta")
 
 [node name="ZonaPerdida" type="Area2D" parent="." unique_id=1209006696]
 position = Vector2(640, 760)
@@ -175,7 +164,7 @@ text = "Reiniciar"
 [node name="GameManager" type="Node" parent="." unique_id=1882752771]
 script = ExtResource("8_game_manager_script")
 spawner_path = NodePath("../SpawnerAgua")
-meta_path = NodePath("../MetaAgua")
+meta_path = NodePath("../GoalZone")
 gotas_totales = 50
 gotas_objetivo = 10
 siguiente_nivel = ExtResource("13_nivel_02")

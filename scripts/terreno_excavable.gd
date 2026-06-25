@@ -39,7 +39,3 @@ func _generar_terreno_inicial() -> void:
 				Vector2i.ZERO,
 				0
 			)
-
-	for x in range(meta_hueco_inicio.x, meta_hueco_inicio.x + meta_hueco_tamano.x):
-		for y in range(meta_hueco_inicio.y, meta_hueco_inicio.y + meta_hueco_tamano.y):
-			erase_cell(Vector2i(x, y))

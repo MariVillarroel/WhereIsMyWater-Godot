@@ -93,6 +93,40 @@ func _ready() -> void:
 
 	var image := _rasterizer.rasterize(_terrain)
 
+	var additions = get_tree().get_nodes_in_group("terrain_additions")
+	var erasers = get_tree().get_nodes_in_group("terrain_erasers")
+	
+	for eraser in erasers:
+		if eraser is Sprite2D and eraser.texture != null:
+			var tex_size = eraser.texture.get_size()
+			var real_size = Vector2(tex_size.x * abs(eraser.scale.x), tex_size.y * abs(eraser.scale.y))
+			var local_pos = _terrain.to_local(eraser.global_position) - _terrain_origin_local()
+			var dest = local_pos - (real_size / 2.0)
+			var rect = Rect2i(Vector2i(round(dest.x), round(dest.y)), Vector2i(round(real_size.x), round(real_size.y)))
+			rect = rect.intersection(Rect2i(Vector2i.ZERO, image.get_size()))
+			image.fill_rect(rect, Color.TRANSPARENT)
+
+	for add in additions:
+		if add is Sprite2D and add.texture != null:
+			var tex_img = add.texture.get_image()
+			if tex_img != null:
+				if tex_img.is_compressed():
+					tex_img.decompress()
+				if tex_img.get_format() != Image.FORMAT_RGBA8:
+					tex_img.convert(Image.FORMAT_RGBA8)
+				
+				if add.scale != Vector2.ONE:
+					var new_w = max(1, int(tex_img.get_width() * add.scale.x))
+					var new_h = max(1, int(tex_img.get_height() * add.scale.y))
+					tex_img.resize(new_w, new_h, Image.INTERPOLATE_BILINEAR)
+				
+				var local_pos = _terrain.to_local(add.global_position) - _terrain_origin_local()
+				var tex_size = tex_img.get_size()
+				var dest = local_pos - (Vector2(tex_size) / 2.0)
+				
+				image.blend_rect(tex_img, Rect2i(Vector2i.ZERO, tex_size), Vector2i(round(dest.x), round(dest.y)))
+				add.visible = false
+
 	_mask = TerrainMask.new()
 	_mask.setup(image)
 
