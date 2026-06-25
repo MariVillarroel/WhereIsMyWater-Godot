@@ -27,6 +27,11 @@ extends StaticBody2D
 
 var _polygon_pool: Array[CollisionPolygon2D] = []
 
+func _ready() -> void:
+	var mat = PhysicsMaterial.new()
+	mat.friction = 0.0
+	physics_material_override = mat
+
 
 func rebuild(image: Image) -> void:
 

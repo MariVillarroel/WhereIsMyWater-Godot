@@ -2,8 +2,8 @@ extends RigidBody2D
 
 const GRUPO_GOTAS := "gotas_agua"
 
-@export var impulso_agitacion_lateral: float = 0.18
-@export var velocidad_horizontal_maxima: float = 150.0
+@export var impulso_agitacion_lateral: float = 0.45
+@export var velocidad_horizontal_maxima: float = 250.0
 
 var _direccion_agitacion := 1.0
 
