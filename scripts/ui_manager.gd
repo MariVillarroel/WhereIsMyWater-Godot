@@ -28,7 +28,7 @@ const HUD_LEVEL_WIDTH := 88.0
 const HUD_COUNTER_WIDTH := 103.0
 
 func _ready() -> void:
-
+	get_tree().root.size_changed.connect(_on_viewport_resized)
 	_crear_interfaz()
 
 	if _game_manager != null:
@@ -55,6 +55,14 @@ func _process(_delta: float) -> void:
 
 	actualizar_restantes(int(_game_manager.obtener_gotas_restantes()))
 
+
+func _on_viewport_resized() -> void:
+	var w := get_viewport().get_visible_rect().size.x
+	if _hud_level != null:
+		_hud_level.position.x = w - HUD_SIDE - HUD_LEVEL_WIDTH
+	if _hud_counter != null:
+		var level_x := w - HUD_SIDE - HUD_LEVEL_WIDTH
+		_hud_counter.position.x = level_x - HUD_GAP - HUD_COUNTER_WIDTH
 
 func actualizar_progreso(
 	gotas_recibidas: int,
@@ -153,9 +161,19 @@ func _actualizar_boton_siguiente_nivel() -> void:
 	if _boton_siguiente_nivel == null or _game_manager == null:
 		return
 
+	print("================================")
+	print("PackedScene:", _game_manager.siguiente_nivel)
+	print("Visible:", _boton_siguiente_nivel.visible)
+	print("Disabled:", _boton_siguiente_nivel.disabled)
+	print("================================")
+
 	var tiene_siguiente_nivel: bool = _game_manager.get("siguiente_nivel") != null
 	_boton_siguiente_nivel.visible = tiene_siguiente_nivel
 	_boton_siguiente_nivel.disabled = not tiene_siguiente_nivel
+
+	print("Después:")
+	print("Visible:", _boton_siguiente_nivel.visible)
+	print("Disabled:", _boton_siguiente_nivel.disabled)
 
 func _crear_interfaz() -> void:
 
@@ -195,7 +213,8 @@ func _crear_hud_counter() -> void:
 
 	_hud_counter = HudCounter.new()
 
-	var level_x := VIEWPORT_WIDTH - HUD_SIDE - HUD_LEVEL_WIDTH
+	var w := get_viewport().get_visible_rect().size.x
+	var level_x := w - HUD_SIDE - HUD_LEVEL_WIDTH
 	_hud_counter.position = Vector2(
 		level_x - HUD_GAP - HUD_COUNTER_WIDTH,
 		HUD_TOP
@@ -208,8 +227,9 @@ func _crear_hud_level() -> void:
 
 	_hud_level = HudLevel.new()
 
+	var w := get_viewport().get_visible_rect().size.x
 	_hud_level.position = Vector2(
-		VIEWPORT_WIDTH - HUD_SIDE - HUD_LEVEL_WIDTH,
+		w - HUD_SIDE - HUD_LEVEL_WIDTH,
 		HUD_TOP
 	)
 

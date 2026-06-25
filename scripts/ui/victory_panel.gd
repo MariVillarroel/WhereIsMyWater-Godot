@@ -149,7 +149,7 @@ func update_layout() -> void:
 			100.0
 		)
 
-	var show_next := _boton_siguiente_nivel != null and _boton_siguiente_nivel.visible
+	var show_next := _boton_siguiente_nivel != null and not _boton_siguiente_nivel.disabled
 
 	if show_next and _boton_reiniciar:
 		var gap := 12.0
