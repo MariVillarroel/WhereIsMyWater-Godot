@@ -5,7 +5,6 @@ const UITheme = preload("res://scripts/ui/ui_theme.gd")
 var DEFEAT_FRAME := preload("res://assets/ui/derrota_frame.png")
 var DEFEAT_WATER := preload("res://assets/ui/derrota_water.png")
 var RESTART_TEXTURE := preload("res://assets/ui/restart.png")
-var NEXT_LEVEL_TEXTURE := preload("res://assets/ui/next_level.png")
 
 var _backdrop: TextureRect
 var _frame: PixelTexture
@@ -14,7 +13,6 @@ var _subtitle_label: PixelLabel
 var _water_icon: PixelTexture
 
 var _boton_reiniciar: Button
-var _boton_siguiente_nivel: Button
 
 
 func inicializar() -> void:
@@ -26,10 +24,14 @@ func inicializar() -> void:
 		placeholder_label.visible = false
 
 	_boton_reiniciar = get_node_or_null("BotonReiniciar")
-	_boton_siguiente_nivel = get_node_or_null("BotonSiguienteNivel")
 
 	if _boton_reiniciar == null:
-		push_warning("No se encontró BotonReiniciar en PanelDerrota")
+		push_warning("No se encontró BotonReiniciar")
+
+	var boton_siguiente := get_node_or_null("BotonSiguienteNivel")
+	if boton_siguiente:
+		boton_siguiente.visible = false
+		boton_siguiente.disabled = true
 
 	# Creamos el degradado de fondo (radial dimmer)
 	var gradient_texture := GradientTexture2D.new()
@@ -50,15 +52,14 @@ func inicializar() -> void:
 	_backdrop.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(_backdrop)
 
-	# Configuramos el tamaño del panel según las dimensiones de derrota_frame.png (485x414)
-	custom_minimum_size = Vector2(485, 414)
+	custom_minimum_size = Vector2(365, 291)
 	size = custom_minimum_size
 
 	_frame = PixelTexture.frame(DEFEAT_FRAME)
-	_frame.resize(485, 414)
+	_frame.resize(365, 291)
 	_frame.position = Vector2.ZERO
 	add_child(_frame)
-	
+
 	move_child(_backdrop, 0)
 	move_child(_frame, 1)
 
@@ -68,19 +69,13 @@ func inicializar() -> void:
 	_subtitle_label = PixelLabel.defeat_subtitle("TE QUEDASTE SIN GOTAS")
 	add_child(_subtitle_label)
 
-	# Creamos la gota gris del centro
 	_water_icon = PixelTexture.sprite(DEFEAT_WATER)
-	_water_icon.resize(170, 122)
+	_water_icon.resize(110, 80)
 	add_child(_water_icon)
 
 	if _boton_reiniciar:
 		_style_button(_boton_reiniciar, RESTART_TEXTURE)
 		move_child(_boton_reiniciar, get_child_count() - 1)
-
-	if _boton_siguiente_nivel:
-		_style_button(_boton_siguiente_nivel, NEXT_LEVEL_TEXTURE)
-		move_child(_boton_siguiente_nivel, get_child_count() - 1)
-		_boton_siguiente_nivel.visibility_changed.connect(update_layout)
 
 	update_layout()
 
@@ -132,43 +127,26 @@ func _style_button(button: Button, texture: Texture2D) -> void:
 func update_layout() -> void:
 	if _title_label:
 		_title_label.position = Vector2(
-			(485.0 - _title_label.size.x) * 0.5,
-			45.0
+			(365.0 - _title_label.size.x) * 0.5,
+			32.0
 		)
 
 	if _subtitle_label:
 		_subtitle_label.position = Vector2(
-			(485.0 - _subtitle_label.size.x) * 0.5,
-			100.0
+			(365.0 - _subtitle_label.size.x) * 0.5,
+			72.0
 		)
 
 	if _water_icon:
 		_water_icon.position = Vector2(
-			(485.0 - 170.0) * 0.5,
-			145.0
+			(365.0 - 110.0) * 0.5,
+			100.0
 		)
 
-	var show_next := _boton_siguiente_nivel != null and _boton_siguiente_nivel.visible
-
-	if show_next and _boton_reiniciar:
-		var gap := 24.0
-		var restart_w := RESTART_TEXTURE.get_width()
-		var next_w := NEXT_LEVEL_TEXTURE.get_width()
-
-		var total := restart_w + next_w + gap
-		var start_x := (485.0 - total) * 0.5
-
-		_boton_reiniciar.position = Vector2(start_x, 320)
-
-		_boton_siguiente_nivel.position = Vector2(
-			start_x + restart_w + gap,
-			320
-		)
-
-	elif _boton_reiniciar:
+	if _boton_reiniciar:
 		_boton_reiniciar.position = Vector2(
-			(485.0 - RESTART_TEXTURE.get_width()) * 0.5,
-			320
+			(365.0 - RESTART_TEXTURE.get_width()) * 0.5,
+			205.0
 		)
 
 

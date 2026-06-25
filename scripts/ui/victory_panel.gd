@@ -53,11 +53,11 @@ func inicializar() -> void:
 	_backdrop.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(_backdrop)
 
-	custom_minimum_size = Vector2(574, 434)
+	custom_minimum_size = Vector2(365, 291)
 	size = custom_minimum_size
 
 	_frame = PixelTexture.frame(VICTORY_FRAME)
-	_frame.resize(574, 434)
+	_frame.resize(365, 291)
 	_frame.position = Vector2.ZERO
 	add_child(_frame)
 	
@@ -71,7 +71,7 @@ func inicializar() -> void:
 	add_child(_subtitle_label)
 
 	_water_icon = PixelTexture.sprite(VICTORY_WATER)
-	_water_icon.resize(180, 130)
+	_water_icon.resize(110, 80)
 	add_child(_water_icon)
 
 	if _boton_reiniciar:
@@ -133,43 +133,43 @@ func _style_button(button: Button, texture: Texture2D) -> void:
 func update_layout() -> void:
 	if _title_label:
 		_title_label.position = Vector2(
-			(574.0 - _title_label.size.x) * 0.5,
-			45.0
+			(365.0 - _title_label.size.x) * 0.5,
+			32.0
 		)
 
 	if _subtitle_label:
 		_subtitle_label.position = Vector2(
-			(574.0 - _subtitle_label.size.x) * 0.5,
-			100.0
+			(365.0 - _subtitle_label.size.x) * 0.5,
+			72.0
 		)
 
 	if _water_icon:
 		_water_icon.position = Vector2(
-			(574.0 - 180.0) * 0.5,
-			145.0
+			(365.0 - 110.0) * 0.5,
+			100.0
 		)
 
 	var show_next := _boton_siguiente_nivel != null and _boton_siguiente_nivel.visible
 
 	if show_next and _boton_reiniciar:
-		var gap := 24.0
+		var gap := 12.0
 		var restart_w := RESTART_TEXTURE.get_width()
 		var next_w := NEXT_LEVEL_TEXTURE.get_width()
 
 		var total := restart_w + next_w + gap
-		var start_x := (574.0 - total) * 0.5
+		var start_x := (365.0 - total) * 0.5
 
-		_boton_reiniciar.position = Vector2(start_x, 320)
+		_boton_reiniciar.position = Vector2(start_x, 205)
 
 		_boton_siguiente_nivel.position = Vector2(
 			start_x + restart_w + gap,
-			320
+			205
 		)
 
 	elif _boton_reiniciar:
 		_boton_reiniciar.position = Vector2(
-			(574.0 - RESTART_TEXTURE.get_width()) * 0.5,
-			320
+			(365.0 - RESTART_TEXTURE.get_width()) * 0.5,
+			205
 		)
 
 

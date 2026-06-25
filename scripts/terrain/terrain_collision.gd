@@ -4,24 +4,20 @@ extends StaticBody2D
 ## Genera la colisión del terreno destructible de forma completamente
 ## procedural a partir de una Image (canal alfa = sólido/vacío).
 ##
-## No usa TileMap ni colisión basada en celdas. En su lugar, ejecuta
-## Marching Squares sobre la imagen para extraer los contornos exactos
-## de las zonas sólidas y crea un CollisionPolygon2D hijo por cada
-## contorno encontrado.
+## No usa TileMap ni colisión basada en celdas. En su lugar, utiliza
+## el método nativo BitMap.opaque_to_polygons de Godot para extraer
+## los contornos exactos de las zonas sólidas de manera ultra-rápida y
+## crea un CollisionPolygon2D hijo por cada contorno encontrado.
 ##
 ## Soporta dos modos de reconstrucción:
 ##   - rebuild_full(image): recorre toda la imagen. Se usa una sola vez
 ##     al iniciar el nivel.
 ##   - rebuild_region(image, rect): recorre solo una región (por ejemplo
-##     el área afectada por un disparo de excavación). Es muchísimo más
-##     barato y es lo que se debe usar en cada excavación.
-##
-## Como el contorno de una excavación puede fusionar o separar formas
-## que están fuera de la región excavada, "rebuild_region" en realidad
-## reconstruye TODOS los polígonos (es necesario para tener un contorno
-## topológicamente correcto), pero usa un BinaryImage acotado a un
-## rectángulo expandido como optimización cuando el terreno es grande
-## y la mayoría de los polígonos no han cambiado de forma.
+##     el área afectada por un disparo de excavación). En esta implementación
+##     basada en BitMap, la reconstrucción completa es tan rápida que 
+##     rebuild_region simplemente delega en una reconstrucción completa para 
+##     garantizar la corrección topológica perfecta sin penalización 
+##     significativa de rendimiento.
 ##
 ## En la práctica, para terrenos de tamaño de nivel (no mundos infinitos),
 ## el costo de Marching Squares completo es bajo (miles de celdas, no
@@ -29,16 +25,20 @@ extends StaticBody2D
 ## cada llamada a rebuild_full/rebuild_region reconstruye el conjunto
 ## completo de polígonos a partir del estado actual de la imagen.
 
-var _binary_image := BinaryImage.new()
 var _polygon_pool: Array[CollisionPolygon2D] = []
 
 
 func rebuild(image: Image) -> void:
 
-	_binary_image.setup(image)
+	var bitmap := BitMap.new()
+	bitmap.create_from_image_alpha(image)
 
-	var segments := MarchingSquares.extract_segments(_binary_image)
-	var polygons := ContourBuilder.build_polygons(segments)
+	var rect := Rect2(0, 0, image.get_width(), image.get_height())
+	var raw_polygons := bitmap.opaque_to_polygons(rect, 1.0)
+
+	var polygons: Array[PackedVector2Array] = []
+	for p in raw_polygons:
+		polygons.append(p)
 
 	_apply_polygons(polygons)
 
