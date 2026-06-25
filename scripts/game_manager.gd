@@ -1,6 +1,6 @@
 extends Node
 
-signal contador_actualizado(gotas_recibidas: int, gotas_objetivo: int)
+signal progreso_actualizado(gotas_recibidas: int, gotas_objetivo: int, gotas_restantes: int)
 signal victoria
 signal derrota
 
@@ -15,6 +15,7 @@ enum EstadoJuego {
 @export_node_path("Node") var spawner_path: NodePath
 @export_node_path("Area2D") var meta_path: NodePath
 @export var nombre_nivel: String = "Nivel 1"
+@export var numero_nivel: int = 1
 @export var gotas_totales: int = 100
 @export var gotas_objetivo: int = 20
 @export var siguiente_nivel: PackedScene
@@ -46,7 +47,11 @@ func iniciar_nivel() -> void:
 	partida_terminada = false
 	generacion_terminada = false
 	estado_actual = EstadoJuego.JUGANDO
-	contador_actualizado.emit(gotas_recibidas, gotas_objetivo)
+	_emit_progreso()
+
+
+func _emit_progreso() -> void:
+	progreso_actualizado.emit(gotas_recibidas, gotas_objetivo, obtener_gotas_restantes())
 
 
 func puede_jugar() -> bool:
@@ -69,6 +74,7 @@ func registrar_gota_generada() -> void:
 
 func _on_gota_generada(cantidad_generada: int) -> void:
 	gotas_generadas = cantidad_generada
+	_emit_progreso()
 
 
 func registrar_gota_recibida() -> int:
@@ -76,7 +82,7 @@ func registrar_gota_recibida() -> int:
 		return gotas_recibidas
 
 	gotas_recibidas += 1
-	contador_actualizado.emit(gotas_recibidas, gotas_objetivo)
+	_emit_progreso()
 	evaluar_estado()
 
 	return gotas_recibidas
@@ -87,7 +93,7 @@ func _on_gota_recibida(total_recibidas: int) -> void:
 		return
 
 	gotas_recibidas = total_recibidas
-	contador_actualizado.emit(gotas_recibidas, gotas_objetivo)
+	_emit_progreso()
 	evaluar_estado()
 
 
@@ -153,3 +159,15 @@ func _finalizar_con_derrota() -> void:
 func _detener_spawner() -> void:
 	if _spawner != null and _spawner.has_method("detener"):
 		_spawner.detener()
+
+
+func reiniciar_nivel() -> void:
+	get_tree().call_deferred("reload_current_scene")
+
+
+func cargar_siguiente_nivel() -> void:
+	if siguiente_nivel == null:
+		push_warning("No hay siguiente nivel configurado para %s." % nombre_nivel)
+		return
+
+	get_tree().call_deferred("change_scene_to_packed", siguiente_nivel)

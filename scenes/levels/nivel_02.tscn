@@ -1,0 +1,169 @@
+[gd_scene format=4 uid="uid://buiq3m8dic771"]
+
+[ext_resource type="TileSet" uid="uid://brdem2x7nl7km" path="res://assets/tiles/terrain_tileset.tres" id="1_tileset"]
+[ext_resource type="Script" uid="uid://bwch17chkdumj" path="res://scripts/terreno_excavable.gd" id="2_terrain_script"]
+[ext_resource type="PackedScene" path="res://scenes/gota_agua.tscn" id="3_sugp2"]
+[ext_resource type="Script" uid="uid://mwmva1obepvi" path="res://scripts/spawner_agua.gd" id="4_spawner_script"]
+[ext_resource type="Script" uid="uid://bcl6qwom6r0d1" path="res://scripts/meta_agua.gd" id="6_meta_script"]
+[ext_resource type="Texture2D" uid="uid://bxo37yn5qttwy" path="res://assets/goal_zone.svg" id="7_goal_texture"]
+[ext_resource type="Script" uid="uid://hgv756ktmami" path="res://scripts/game_manager.gd" id="8_game_manager_script"]
+[ext_resource type="Script" uid="uid://ddaqrm8cjj0sg" path="res://scripts/ui_manager.gd" id="9_ui_manager_script"]
+[ext_resource type="Script" uid="uid://ipdpspute3ak" path="res://scripts/zona_perdida.gd" id="10_zona_perdida_script"]
+[ext_resource type="Script" uid="uid://jd4patgn2nh2" path="res://scripts/agua_poligono_visual.gd" id="11_agua_poligono_script"]
+[ext_resource type="Material" path="res://materials/agua_visual_poligono.tres" id="12_agua_visual_material"]
+[ext_resource type="Script" uid="uid://x2jtqepvybkm" path="res://scripts/ui/fondo_juego.gd" id="14_fondo_script"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_meta"]
+size = Vector2(96, 96)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_zona_perdida"]
+size = Vector2(1400, 120)
+
+[node name="NivelBase" type="Node2D" unique_id=998019246]
+
+[node name="Fondo" type="CanvasLayer" parent="." unique_id=1720166847]
+layer = -10
+script = ExtResource("14_fondo_script")
+
+[node name="Terreno" type="TileMapLayer" parent="." unique_id=910855021]
+tile_map_data = PackedByteArray("AAAAAAUAAwAAAAAAAAAAAAYAAwAAAAAAAAAAAAsAAwAAAAAAAAABAAUAAwAAAAAAAAABAAYAAwAAAAAAAAABAAsAAwAAAAAAAAACAAUAAwAAAAAAAAACAAYAAwAAAAAAAAACAAsAAwAAAAAAAAADAAUAAwAAAAAAAAADAAYAAwAAAAAAAAADAAsAAwAAAAAAAAAEAAUAAwAAAAAAAAAEAAYAAwAAAAAAAAAEAAsAAwAAAAAAAAAFAAUAAwAAAAAAAAAFAAYAAwAAAAAAAAAFAAcAAwAAAAAAAAAFAAgAAwAAAAAAAAAFAAkAAwAAAAAAAAAFAAoAAwAAAAAAAAAFAAsAAwAAAAAAAAAGAAUAAwAAAAAAAAAGAAYAAwAAAAAAAAAGAAcAAwAAAAAAAAAGAAgAAwAAAAAAAAAGAAkAAwAAAAAAAAAGAAoAAwAAAAAAAAAGAAsAAwAAAAAAAAAHAAUAAwAAAAAAAAAHAAYAAwAAAAAAAAAHAAcAAwAAAAAAAAAHAAgAAwAAAAAAAAAHAAkAAwAAAAAAAAAHAAoAAwAAAAAAAAAHAAsAAwAAAAAAAAAIAAUAAwAAAAAAAAAIAAYAAwAAAAAAAAAIAAcAAwAAAAAAAAAIAAgAAwAAAAAAAAAIAAkAAwAAAAAAAAAIAAoAAwAAAAAAAAAIAAsAAwAAAAAAAAAJAAUAAwAAAAAAAAAJAAYAAwAAAAAAAAAJAAcAAwAAAAAAAAAJAAgAAwAAAAAAAAAJAAkAAwAAAAAAAAAJAAoAAwAAAAAAAAAJAAsAAwAAAAAAAAAKAAUAAwAAAAAAAAAKAAYAAwAAAAAAAAAKAAcAAwAAAAAAAAAKAAgAAwAAAAAAAAAKAAkAAwAAAAAAAAAKAAoAAwAAAAAAAAAKAAsAAwAAAAAAAAALAAUAAwAAAAAAAAALAAYAAwAAAAAAAAALAAcAAwAAAAAAAAALAAgAAwAAAAAAAAALAAkAAwAAAAAAAAALAAoAAwAAAAAAAAALAAsAAwAAAAAAAAAMAAUAAwAAAAAAAAAMAAYAAwAAAAAAAAAMAAcAAwAAAAAAAAAMAAgAAwAAAAAAAAAMAAkAAwAAAAAAAAAMAAoAAwAAAAAAAAAMAAsAAwAAAAAAAAANAAUAAwAAAAAAAAANAAYAAwAAAAAAAAANAAcAAwAAAAAAAAANAAgAAwAAAAAAAAANAAkAAwAAAAAAAAANAAoAAwAAAAAAAAANAAsAAwAAAAAAAAAOAAUAAwAAAAAAAAAOAAYAAwAAAAAAAAAOAAcAAwAAAAAAAAAOAAgAAwAAAAAAAAAOAAkAAwAAAAAAAAAOAAoAAwAAAAAAAAAOAAsAAwAAAAAAAAAPAAUAAwAAAAAAAAAPAAYAAwAAAAAAAAAPAAcAAwAAAAAAAAAPAAgAAwAAAAAAAAAPAAkAAwAAAAAAAAAPAAoAAwAAAAAAAAAPAAsAAwAAAAAAAAAAAAQAAwAAAAAAAAABAAQAAwAAAAAAAAACAAQAAwAAAAAAAAADAAQAAwAAAAAAAAAEAAQAAwAAAAAAAAAFAAQAAwAAAAAAAAAGAAQAAwAAAAAAAAAHAAQAAwAAAAAAAAAIAAQAAwAAAAAAAAAJAAQAAwAAAAAAAAAKAAQAAwAAAAAAAAALAAQAAwAAAAAAAAAMAAQAAwAAAAAAAAANAAQAAwAAAAAAAAAOAAQAAwAAAAAAAAAPAAQAAwAAAAAAAAAAAAMABAAAAAAAAAABAAMABAAAAAAAAAACAAMABAAAAAAAAAADAAMABAAAAAAAAAAEAAMABAAAAAAAAAAFAAMABAAAAAAAAAAGAAMABAAAAAAAAAAHAAMABAAAAAAAAAAIAAMABAAAAAAAAAAJAAMABAAAAAAAAAAKAAMABAAAAAAAAAALAAMABAAAAAAAAAAMAAMABAAAAAAAAAANAAMABAAAAAAAAAAOAAMABAAAAAAAAAAPAAMABAAAAAAAAAA=")
+tile_set = ExtResource("1_tileset")
+script = ExtResource("2_terrain_script")
+inicio_tierra_y = 5
+radio_excavacion = 1
+meta_hueco_inicio = Vector2i(0, 7)
+game_manager_path = NodePath("../GameManager")
+
+[node name="AguaCanvasGroup" type="CanvasGroup" parent="." unique_id=298632946]
+
+[node name="AguaPoligonoVisual" type="Node2D" parent="." unique_id=575986410]
+material = ExtResource("12_agua_visual_material")
+script = ExtResource("11_agua_poligono_script")
+terreno_path = NodePath("../Terreno")
+
+[node name="SpawnerAgua" type="Node2D" parent="." unique_id=1402052552]
+position = Vector2(960, 96)
+script = ExtResource("4_spawner_script")
+escena_gota = ExtResource("3_sugp2")
+agua_canvas_group_path = NodePath("../AguaCanvasGroup")
+game_manager_path = NodePath("../GameManager")
+
+[node name="MetaAgua" type="Area2D" parent="." unique_id=2064424904]
+position = Vector2(160, 512)
+collision_mask = 2
+script = ExtResource("6_meta_script")
+game_manager_path = NodePath("../GameManager")
+
+[node name="Sprite2D" type="Sprite2D" parent="MetaAgua" unique_id=704403770]
+texture = ExtResource("7_goal_texture")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MetaAgua" unique_id=372251649]
+shape = SubResource("RectangleShape2D_meta")
+
+[node name="ZonaPerdida" type="Area2D" parent="." unique_id=328861795]
+position = Vector2(640, 760)
+collision_mask = 2
+script = ExtResource("10_zona_perdida_script")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ZonaPerdida" unique_id=534166824]
+shape = SubResource("RectangleShape2D_zona_perdida")
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=707773110]
+script = ExtResource("9_ui_manager_script")
+game_manager_path = NodePath("../GameManager")
+panel_victoria_path = NodePath("PanelVictoria")
+panel_derrota_path = NodePath("PanelDerrota")
+boton_reiniciar_victoria_path = NodePath("PanelVictoria/BotonReiniciar")
+boton_siguiente_nivel_path = NodePath("PanelVictoria/BotonSiguienteNivel")
+boton_reiniciar_derrota_path = NodePath("PanelDerrota/BotonReiniciar")
+
+[node name="LabelProgreso" type="Label" parent="UI" unique_id=116100635]
+visible = false
+offset_left = 24.0
+offset_top = 20.0
+offset_right = 280.0
+offset_bottom = 46.0
+text = "Recibidas: 0 / 15"
+
+[node name="LabelRestante" type="Label" parent="UI" unique_id=1021135163]
+visible = false
+offset_left = 24.0
+offset_top = 48.0
+offset_right = 280.0
+offset_bottom = 74.0
+text = "Restantes: 60"
+
+[node name="LabelEstado" type="Label" parent="UI" unique_id=227355978]
+visible = false
+offset_left = 352.0
+offset_top = 40.0
+offset_right = 672.0
+offset_bottom = 88.0
+horizontal_alignment = 1
+
+[node name="PanelVictoria" type="Panel" parent="UI" unique_id=1354168825]
+visible = false
+offset_left = 400.0
+offset_top = 240.0
+offset_right = 880.0
+offset_bottom = 420.0
+
+[node name="LabelMensaje" type="Label" parent="UI/PanelVictoria" unique_id=410108382]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 16.0
+offset_right = 456.0
+offset_bottom = 52.0
+theme_override_font_sizes/font_size = 24
+text = "¡Victoria! Salvaste suficiente agua."
+horizontal_alignment = 1
+
+[node name="BotonReiniciar" type="Button" parent="UI/PanelVictoria" unique_id=1950610619]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 80.0
+offset_right = 208.0
+offset_bottom = 120.0
+text = "Reiniciar"
+
+[node name="BotonSiguienteNivel" type="Button" parent="UI/PanelVictoria" unique_id=979794144]
+layout_mode = 0
+offset_left = 272.0
+offset_top = 80.0
+offset_right = 432.0
+offset_bottom = 120.0
+text = "Siguiente nivel"
+
+[node name="PanelDerrota" type="Panel" parent="UI" unique_id=725541651]
+visible = false
+offset_left = 400.0
+offset_top = 240.0
+offset_right = 880.0
+offset_bottom = 400.0
+
+[node name="LabelMensaje" type="Label" parent="UI/PanelDerrota" unique_id=2036327051]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 16.0
+offset_right = 456.0
+offset_bottom = 52.0
+theme_override_font_sizes/font_size = 24
+text = "Derrota. No llegó suficiente agua a la meta."
+horizontal_alignment = 1
+
+[node name="BotonReiniciar" type="Button" parent="UI/PanelDerrota" unique_id=397035854]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 80.0
+offset_right = 320.0
+offset_bottom = 120.0
+text = "Reiniciar"
+
+[node name="GameManager" type="Node" parent="." unique_id=1369370267]
+script = ExtResource("8_game_manager_script")
+spawner_path = NodePath("../SpawnerAgua")
+meta_path = NodePath("../MetaAgua")
+nombre_nivel = "Nivel 2"
+numero_nivel = 2
+gotas_totales = 60
+gotas_objetivo = 15

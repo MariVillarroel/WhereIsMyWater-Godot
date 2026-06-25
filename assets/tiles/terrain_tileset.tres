@@ -1,14 +1,23 @@
 [gd_resource type="TileSet" format=3 uid="uid://brdem2x7nl7km"]
 
-[ext_resource type="Texture2D" uid="uid://ci6mxvm1qd0rk" path="res://assets/tiles/earth_tile.svg" id="1_earth"]
+[ext_resource type="Texture2D" uid="uid://btmjy7gccifka" path="res://assets/tiles/earth_tile.png" id="1_2fg5e"]
+[ext_resource type="Texture2D" uid="uid://bkgyo45wfgpcd" path="res://assets/tiles/grass_tile.png" id="2_clpbi"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_earth"]
-texture = ExtResource("1_earth")
-texture_region_size = Vector2i(32, 32)
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ykcb8"]
+texture = ExtResource("1_2fg5e")
+texture_region_size = Vector2i(64, 64)
 0:0/0 = 0
-0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32, -32, 32)
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_4xcxg"]
+texture = ExtResource("2_clpbi")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
 
 [resource]
-tile_size = Vector2i(32, 32)
+tile_size = Vector2i(64, 64)
 physics_layer_0/collision_layer = 1
-sources/0 = SubResource("TileSetAtlasSource_earth")
+terrain_set_0/mode = 0
+sources/5 = SubResource("TileSetAtlasSource_ykcb8")
+sources/6 = SubResource("TileSetAtlasSource_4xcxg")

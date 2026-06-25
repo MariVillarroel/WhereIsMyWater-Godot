@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ci6mxvm1qd0rk"
-path="res://.godot/imported/earth_tile.svg-fabf0b236e68d8331f5d584ba0d4b89b.ctex"
+uid="uid://bkgyo45wfgpcd"
+path="res://.godot/imported/grass_tile.png-9139048749b1c4f210b92a286a85ffd5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/tiles/earth_tile.svg"
-dest_files=["res://.godot/imported/earth_tile.svg-fabf0b236e68d8331f5d584ba0d4b89b.ctex"]
+source_file="res://assets/tiles/grass_tile.png"
+dest_files=["res://.godot/imported/grass_tile.png-9139048749b1c4f210b92a286a85ffd5.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false
