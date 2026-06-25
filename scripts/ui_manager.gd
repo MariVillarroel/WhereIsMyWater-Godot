@@ -178,6 +178,11 @@ func _crear_interfaz() -> void:
 		if _panel_victoria.has_method("inicializar"):
 			_panel_victoria.inicializar()
 
+	if _panel_derrota != null:
+		_panel_derrota.set_script(preload("res://scripts/ui/defeat_panel.gd"))
+		if _panel_derrota.has_method("inicializar"):
+			_panel_derrota.inicializar()
+
 func _crear_hud_principal() -> void:
 
 	_hud_main = HudMain.new()

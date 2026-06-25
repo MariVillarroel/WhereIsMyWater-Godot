@@ -115,6 +115,23 @@ static func victory_subtitle(value: String) -> PixelLabel:
 	)
 
 # Defeat
+static func defeat_title(value: String) -> PixelLabel:
+	return _create(
+		value,
+		UITheme.FONT_BOLD,
+		42,
+		Color("#FF1A1A")
+	)
+
+
+static func defeat_subtitle(value: String) -> PixelLabel:
+	return _create(
+		value,
+		UITheme.FONT_BOLD,
+		20,
+		UITheme.COLOR_WHITE
+	)
+
 # Timer
 # Dialog
 # Buttons

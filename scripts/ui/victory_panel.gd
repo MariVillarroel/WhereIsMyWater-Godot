@@ -7,6 +7,7 @@ var VICTORY_WATER := preload("res://assets/ui/victory_water.png")
 var RESTART_TEXTURE := preload("res://assets/ui/restart.png")
 var NEXT_LEVEL_TEXTURE := preload("res://assets/ui/next_level.png")
 
+var _backdrop: TextureRect
 var _frame: PixelTexture
 var _title_label: PixelLabel
 var _subtitle_label: PixelLabel
@@ -33,6 +34,25 @@ func inicializar() -> void:
 	if _boton_siguiente_nivel == null:
 		push_warning("No se encontró BotonSiguienteNivel")
 
+	# Creamos el degradado de fondo (radial dimmer)
+	var gradient_texture := GradientTexture2D.new()
+	var gradient := Gradient.new()
+	gradient.colors = PackedColorArray([
+		Color(0, 0, 0, 0.65),
+		Color(0, 0, 0, 0.25)
+	])
+	gradient_texture.gradient = gradient
+	gradient_texture.fill = GradientTexture2D.FILL_RADIAL
+	gradient_texture.fill_from = Vector2(0.5, 0.5)
+	gradient_texture.fill_to = Vector2(1.0, 1.0)
+
+	_backdrop = TextureRect.new()
+	_backdrop.texture = gradient_texture
+	_backdrop.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_backdrop.stretch_mode = TextureRect.STRETCH_SCALE
+	_backdrop.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(_backdrop)
+
 	custom_minimum_size = Vector2(574, 434)
 	size = custom_minimum_size
 
@@ -40,9 +60,11 @@ func inicializar() -> void:
 	_frame.resize(574, 434)
 	_frame.position = Vector2.ZERO
 	add_child(_frame)
-	move_child(_frame, 0)
+	
+	move_child(_backdrop, 0)
+	move_child(_frame, 1)
 
-	_title_label = PixelLabel.victory_title("+ ¡VICTORIA! +")
+	_title_label = PixelLabel.victory_title("¡VICTORIA!")
 	add_child(_title_label)
 
 	_subtitle_label = PixelLabel.victory_subtitle("RECUPERASTE TODAS LAS GOTAS")
@@ -158,5 +180,7 @@ func _on_parent_resized() -> void:
 func _center_in_viewport() -> void:
 	var viewport_size := get_viewport_rect().size
 	position = (viewport_size - size) * 0.5
-
-     
+	
+	if _backdrop:
+		_backdrop.position = -position
+		_backdrop.size = viewport_size
