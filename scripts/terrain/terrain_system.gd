@@ -47,6 +47,7 @@ var collision_path: NodePath
 @export var handle_mouse_input: bool = true
 
 @export_range(1.0, 256.0, 1.0) var dig_radius: float = 28.0
+const DIG_COLLISION_REBUILD_INTERVAL_MSEC := 40
 
 ## Callable opcional: func() -> bool. Si se asigna, se consulta antes de
 ## cada excavación (equivalente al "_puede_excavar" / "puede_jugar" del
@@ -66,6 +67,9 @@ var _used_rect: Rect2i
 var _tile_size: Vector2i
 
 var _is_digging := false
+var _last_dig_global_position := Vector2.ZERO
+var _pending_collision_rect := Rect2i()
+var _last_collision_rebuild_msec := 0
 
 
 func _ready() -> void:
@@ -187,19 +191,25 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.pressed:
 			if not _can_dig():
 				return
+
+			var mouse_position := get_global_mouse_position()
 			_is_digging = true
-			erase_circle(get_global_mouse_position(), dig_radius)
+			_last_dig_global_position = mouse_position
+			erase_circle(mouse_position, dig_radius)
 		else:
+			_flush_pending_collision_rebuild()
 			_is_digging = false
 
 	elif event is InputEventMouseMotion and _is_digging:
 
 		if not _can_dig():
+			_flush_pending_collision_rebuild()
 			_is_digging = false
 			return
 
-		erase_circle(get_global_mouse_position(), dig_radius)
-
+		var mouse_position := get_global_mouse_position()
+		erase_stroke(_last_dig_global_position, mouse_position, dig_radius)
+		_last_dig_global_position = mouse_position
 
 # =====================================================
 # PUBLIC API
@@ -223,11 +233,32 @@ func erase_circle(
 	if affected_rect.size.x <= 0 or affected_rect.size.y <= 0:
 		return
 
-	_visual.update_image_region(affected_rect)
-	_collision.rebuild_region(_mask.image(), affected_rect)
+	_apply_terrain_edit(affected_rect)
 
 	terrain_dug.emit(global_position, radius)
 
+
+## Excava un trazo continuo entre dos posiciones globales. Evita que el
+## camino se vea como una sucesión de círculos cuando el mouse se mueve rápido.
+func erase_stroke(
+	from_global_position: Vector2,
+	to_global_position: Vector2,
+	radius: float
+) -> void:
+
+	if _mask == null:
+		return
+
+	var from_local := _to_image_space(from_global_position)
+	var to_local := _to_image_space(to_global_position)
+	var affected_rect := _mask.erase_stroke(from_local, to_local, radius)
+
+	if affected_rect.size.x <= 0 or affected_rect.size.y <= 0:
+		return
+
+	_apply_terrain_edit(affected_rect)
+
+	terrain_dug.emit(to_global_position, radius)
 
 ## Excava un rectángulo en coordenadas globales del mundo (por ejemplo,
 ## para huecos de meta o explosiones rectangulares).
@@ -250,8 +281,7 @@ func erase_rect(
 	if affected_rect.size.x <= 0 or affected_rect.size.y <= 0:
 		return
 
-	_visual.update_image_region(affected_rect)
-	_collision.rebuild_region(_mask.image(), affected_rect)
+	_apply_terrain_edit(affected_rect, true)
 
 
 ## Consulta de solidez en coordenadas globales del mundo. Pensado para
@@ -298,6 +328,35 @@ func used_rect() -> Rect2i:
 # =====================================================
 # INTERNALS
 # =====================================================
+
+func _apply_terrain_edit(
+	affected_rect: Rect2i,
+	force_collision_rebuild: bool = false
+) -> void:
+
+	_visual.update_image_region(affected_rect)
+
+	if _pending_collision_rect.size.x <= 0 or _pending_collision_rect.size.y <= 0:
+		_pending_collision_rect = affected_rect
+	else:
+		_pending_collision_rect = _pending_collision_rect.merge(affected_rect)
+
+	var now := Time.get_ticks_msec()
+	if force_collision_rebuild or now - _last_collision_rebuild_msec >= DIG_COLLISION_REBUILD_INTERVAL_MSEC:
+		_flush_pending_collision_rebuild()
+
+
+func _flush_pending_collision_rebuild() -> void:
+
+	if _mask == null:
+		return
+
+	if _pending_collision_rect.size.x <= 0 or _pending_collision_rect.size.y <= 0:
+		return
+
+	_collision.rebuild_region(_mask.image(), _pending_collision_rect)
+	_pending_collision_rect = Rect2i()
+	_last_collision_rebuild_msec = Time.get_ticks_msec()
 
 ## Origen, en coordenadas locales de este nodo, donde empieza el
 ## terreno rasterizado (esquina superior izquierda de used_rect).
