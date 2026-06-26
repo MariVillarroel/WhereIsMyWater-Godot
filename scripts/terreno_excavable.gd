@@ -1,15 +1,6 @@
 @tool
 extends TileMapLayer
 
-## Este script SOLO se encarga de pintar el terreno inicial en tiles,
-## como ayuda visual en el editor y como fuente de datos para
-## TerrainRasterizer. Ya NO maneja excavación, input de mouse, ni
-## consulta al GameManager: todo eso ahora vive en TerrainSystem.
-##
-## En runtime, TerrainSystem.rasterize() lee este TileMapLayer una sola
-## vez al iniciar el nivel y luego lo oculta. A partir de ahí, todo el
-## terreno visible y la colisión vienen de la Image generada, no de
-## este nodo.
 
 @export var ancho_en_tiles: int = 16
 @export var alto_en_tiles: int = 12

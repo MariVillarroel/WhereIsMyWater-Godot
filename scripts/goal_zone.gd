@@ -30,7 +30,6 @@ func _ready() -> void:
 		if _game_manager.has_signal("progreso_actualizado"):
 			_game_manager.progreso_actualizado.connect(_on_progreso_actualizado)
 	
-	# Set initial textures
 	plant_sprite.texture = _plant_textures[0]
 	bubble_sprite.texture = _water_bubble_tex
 	

@@ -92,9 +92,6 @@ func _on_gota_generada(cantidad_generada: int) -> void:
 
 
 func registrar_gota_recibida() -> int:
-	if not puede_jugar():
-		return gotas_recibidas
-
 	gotas_recibidas += 1
 	_emit_progreso()
 	evaluar_estado()

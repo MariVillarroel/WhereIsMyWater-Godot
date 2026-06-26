@@ -10,9 +10,6 @@ func _init() -> void:
 	stretch_mode = TextureRect.STRETCH_SCALE
 
 
-# =====================================================
-# FACTORY
-# =====================================================
 
 static func frame(
 	texture: Texture2D,
@@ -62,9 +59,6 @@ static func icon(
 	return rect
 
 
-# =====================================================
-# PRIVATE
-# =====================================================
 
 static func _create(
 	texture: Texture2D
@@ -77,9 +71,6 @@ static func _create(
 	return rect
 
 
-# =====================================================
-# HELPERS
-# =====================================================
 
 func place(
 	x: float,

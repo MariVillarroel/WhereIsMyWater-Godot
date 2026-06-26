@@ -240,12 +240,12 @@ func _layout_hud_derecho() -> void:
 
 	if _hud_level != null:
 		next_x -= HUD_LEVEL_WIDTH
-		_hud_level.position.x = next_x
+		_hud_level.position = Vector2(next_x, HUD_TOP)
 		next_x -= HUD_GAP
 
 	if _hud_counter != null:
 		next_x -= HUD_COUNTER_WIDTH
-		_hud_counter.position.x = next_x
+		_hud_counter.position = Vector2(next_x, HUD_TOP)
 
 func _crear_hud_principal() -> void:
 

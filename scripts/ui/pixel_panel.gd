@@ -11,9 +11,6 @@ func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
-# =====================================================
-# FACTORY
-# =====================================================
 
 static func main() -> PixelPanel:
 	return _create(MAIN_FRAME)
@@ -47,9 +44,6 @@ static func _create(
 	return panel
 
 
-# =====================================================
-# HELPERS
-# =====================================================
 
 func add_control(
 	control: Control,

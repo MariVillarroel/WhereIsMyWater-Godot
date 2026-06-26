@@ -3,16 +3,10 @@ extends Control
 
 const WATER_ICON := preload("res://assets/ui/water_icon.png")
 
-# =====================================================
-# PANEL
-# =====================================================
 
 const PANEL_WIDTH := 103
 const PANEL_HEIGHT := 86
 
-# =====================================================
-# LAYOUT
-# =====================================================
 
 const ICON_X := 8
 const ICON_Y := 14
@@ -24,9 +18,6 @@ const NUMBER_Y := 5
 
 const TEXT_Y := 58
 
-# =====================================================
-# UI
-# =====================================================
 
 var _panel: PixelPanel
 
@@ -41,9 +32,6 @@ func _ready() -> void:
 	_create_ui()
 
 
-# =====================================================
-# PUBLIC API
-# =====================================================
 
 func actualizar(restantes: int) -> void:
 
@@ -52,9 +40,6 @@ func actualizar(restantes: int) -> void:
 	call_deferred("_update_layout")
 
 
-# =====================================================
-# UI
-# =====================================================
 
 func _create_ui() -> void:
 
@@ -67,9 +52,6 @@ func _create_ui() -> void:
 
 	add_child(_panel)
 
-	# -------------------------------------------------
-	# ICONO
-	# -------------------------------------------------
 
 	_icon = PixelTexture.icon(
 		WATER_ICON,
@@ -87,9 +69,6 @@ func _create_ui() -> void:
 		)
 	)
 
-	# -------------------------------------------------
-	# NUMERO
-	# -------------------------------------------------
 
 	_number_label = PixelLabel.counter_number("55")
 
@@ -101,9 +80,6 @@ func _create_ui() -> void:
 		)
 	)
 
-	# -------------------------------------------------
-	# TEXTO
-	# -------------------------------------------------
 
 	_text_label = PixelLabel.counter_text(
 		"RESTANTES"
@@ -117,13 +93,9 @@ func _create_ui() -> void:
 	call_deferred("_update_layout")
 
 
-# =====================================================
-# PRIVATE
-# =====================================================
 
 func _update_layout() -> void:
 
-	# Número alineado con el centro de la gota
 
 	_number_label.position.y = (
 		ICON_Y
@@ -136,7 +108,6 @@ func _update_layout() -> void:
 		* 0.5
 	)
 
-	# Texto centrado
 
 	_text_label.position.x = (
 		(

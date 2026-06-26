@@ -3,9 +3,6 @@ extends Control
 
 const WATER_ICON := preload("res://assets/ui/water_icon.png")
 
-# =====================================================
-# LAYOUT
-# =====================================================
 
 const ICON_X := 18
 const ICON_Y := 18
@@ -28,9 +25,6 @@ const ICON_SIZE := Vector2i(56, 67)
 const TEXT_SPACING := 10
 const PANEL_PADDING := 20
 
-# =====================================================
-# UI
-# =====================================================
 
 var _panel: PixelPanel
 
@@ -48,21 +42,20 @@ func _ready() -> void:
 	_create_ui()
 
 
-# =====================================================
-# PUBLIC API
-# =====================================================
 
 func actualizar(
 	gotas_actuales: int,
 	gotas_objetivo: int
 ) -> void:
 
+	var mostrar_actuales = mini(gotas_actuales, gotas_objetivo)
+
 	_progress.actualizar(
-		gotas_actuales,
+		mostrar_actuales,
 		gotas_objetivo
 	)
 
-	_current_label.text = str(gotas_actuales)
+	_current_label.text = str(mostrar_actuales)
 
 	_total_label.text = "/ %d GOTAS" % gotas_objetivo
 
@@ -70,7 +63,7 @@ func actualizar(
 
 	if gotas_objetivo > 0:
 		porcentaje = roundi(
-			float(gotas_actuales)
+			float(mostrar_actuales)
 			/
 			float(gotas_objetivo)
 			*
@@ -86,9 +79,6 @@ func actualizar_restantes(_restantes: int) -> void:
 	pass
 
 
-# =====================================================
-# UI
-# =====================================================
 
 func _create_ui() -> void:
 
@@ -163,9 +153,6 @@ func _create_ui() -> void:
 	call_deferred("_update_layout")
 
 
-# =====================================================
-# PRIVATE
-# =====================================================
 
 func _update_layout() -> void:
 

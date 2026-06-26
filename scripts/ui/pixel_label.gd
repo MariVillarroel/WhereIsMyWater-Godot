@@ -8,9 +8,6 @@ func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
-# =====================================================
-# HUD MAIN
-# =====================================================
 
 static func title(value: String) -> PixelLabel:
 	return _create(
@@ -48,9 +45,6 @@ static func percent(value: String) -> PixelLabel:
 	)
 
 
-# =====================================================
-# HUD COUNTER
-# =====================================================
 
 static func counter_number(value: String) -> PixelLabel:
 	return _create(
@@ -70,9 +64,6 @@ static func counter_text(value: String) -> PixelLabel:
 	)
 
 
-# =====================================================
-# HUD LEVEL
-# =====================================================
 
 static func level_title(value: String) -> PixelLabel:
 	return _create(
@@ -92,11 +83,6 @@ static func level_number(value: String) -> PixelLabel:
 	)
 
 
-# =====================================================
-# FUTUROS COMPONENTES
-# =====================================================
-#
-# Victory
 static func victory_title(value: String) -> PixelLabel:
 	return _create(
 		value,
@@ -114,7 +100,6 @@ static func victory_subtitle(value: String) -> PixelLabel:
 		UITheme.COLOR_WHITE
 	)
 
-# Defeat
 static func defeat_title(value: String) -> PixelLabel:
 	return _create(
 		value,
@@ -132,16 +117,8 @@ static func defeat_subtitle(value: String) -> PixelLabel:
 		UITheme.COLOR_WHITE
 	)
 
-# Timer
-# Dialog
-# Buttons
-#
-# =====================================================
 
 
-# =====================================================
-# PRIVATE
-# =====================================================
 
 static func _create(
 	value: String,

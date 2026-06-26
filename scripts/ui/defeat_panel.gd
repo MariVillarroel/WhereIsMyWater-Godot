@@ -33,7 +33,6 @@ func inicializar() -> void:
 		boton_siguiente.visible = false
 		boton_siguiente.disabled = true
 
-	# Creamos el degradado de fondo (radial dimmer)
 	var gradient_texture := GradientTexture2D.new()
 	var gradient := Gradient.new()
 	gradient.colors = PackedColorArray([

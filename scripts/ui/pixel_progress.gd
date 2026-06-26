@@ -32,9 +32,6 @@ func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
-# =====================================================
-# PUBLIC API
-# =====================================================
 
 func actualizar(
 	actual: int,

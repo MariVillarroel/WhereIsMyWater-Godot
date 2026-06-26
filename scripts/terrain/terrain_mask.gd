@@ -1,14 +1,6 @@
 class_name TerrainMask
 extends RefCounted
 
-## Responsable exclusivo de mutar los píxeles de la Image del terreno.
-## No sabe nada de TileMap, de colisiones ni de render: solo recibe una
-## Image y la modifica (borra alfa) en las regiones solicitadas.
-##
-## Cada operación de borrado devuelve el Rect2i (en espacio de píxeles,
-## ya recortado a los límites de la imagen) que realmente fue afectado.
-## TerrainSystem usa ese rect para limitar qué porción de la textura y
-## de la colisión hay que reconstruir.
 
 var _image: Image
 var _locked_image: Image

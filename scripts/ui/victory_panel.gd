@@ -34,7 +34,6 @@ func inicializar() -> void:
 	if _boton_siguiente_nivel == null:
 		push_warning("No se encontró BotonSiguienteNivel")
 
-	# Creamos el degradado de fondo (radial dimmer)
 	var gradient_texture := GradientTexture2D.new()
 	var gradient := Gradient.new()
 	gradient.colors = PackedColorArray([
